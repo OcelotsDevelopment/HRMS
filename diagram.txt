@@ -1,0 +1,84 @@
+Table users {
+  id integer [pk, increment]
+  username varchar [not null, unique]
+  email varchar [not null, unique]
+  password_hash varchar [not null]
+  role varchar [not null, note: 'admin, hr, employee']
+  created_at timestamp [default: `now()`]
+}
+
+Table employees {
+  id integer [pk, increment]
+  user_id integer [ref: > users.id, unique] // one-to-one with users
+  name varchar [not null]
+  position varchar
+  department varchar
+  hired_at date
+  created_at timestamp [default: `now()`]
+}
+
+Table leaves {
+  id integer [pk, increment]
+  employee_id integer [ref: > employees.id]
+  leave_type varchar [not null]  // sick, casual, etc
+  start_date date [not null]
+  end_date date [not null]
+  status varchar [default: 'pending'] // approved, rejected
+  created_at timestamp [default: `now()`]
+}
+
+Table payroll {
+  id integer [pk, increment]
+  employee_id integer [ref: > employees.id]
+  salary numeric(12, 2) [not null]
+  pay_date date [not null]
+  created_at timestamp [default: `now()`]
+}
+
+Table posts {
+  id integer [pk, increment]
+  title varchar [not null]
+  body text [note: 'Content of the post']
+  user_id integer [ref: > users.id, not null]
+  status varchar
+  created_at timestamp [default: `now()`]
+}
+
+Table follows {
+  following_user_id integer [ref: > users.id]
+  followed_user_id integer [ref: > users.id]
+  created_at timestamp [default: `now()`]
+  indexes {
+    (following_user_id, followed_user_id) [unique]
+  }
+}
+
+Table attendance {
+  id integer [pk, increment]
+  employee_id integer [ref: > employees.id]
+  date date [not null]
+  status varchar [not null, note: 'present, absent, remote, leave']
+  check_in timestamp
+  check_out timestamp
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    (employee_id, date) [unique]
+  }
+}
+
+Table holidays {
+  id integer [pk, increment]
+  name varchar [not null]
+  date date [not null]
+  status varchar [not null, note: 'leave']
+  description text
+  is_recurring boolean [default: false, note: "Set true for annual holidays"]
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    (date)
+  }
+}
+this is refference for db diagram
+link : https://dbdiagram.io/d
