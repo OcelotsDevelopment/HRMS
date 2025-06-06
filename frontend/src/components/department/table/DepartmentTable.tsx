@@ -5,7 +5,6 @@ import {
   TableHeader,
   TableRow,
 } from "../../ui/table";
-import Badge from "../../ui/badge/Badge";
 import { useDepartmentStore } from "../../../store/departmentStore";
 import { useEffect, useState, type JSX } from "react";
 
@@ -60,7 +59,7 @@ export default function DepartmentTable({openModal}: DepartmentTableProps) {
                 role: "Department Head", // placeholder role
               }
             : undefined,
-        status: "Active", 
+        // status: "Active", 
         action:   <button
             onClick={()=>openModal(department?.id)}
             className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto"
@@ -105,12 +104,12 @@ export default function DepartmentTable({openModal}: DepartmentTableProps) {
               >
                 Department Name
               </TableCell>
-              <TableCell
+              {/* <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
                 Status
-              </TableCell>
+              </TableCell> */}
             </TableRow>
           </TableHeader>
 
@@ -148,7 +147,7 @@ export default function DepartmentTable({openModal}: DepartmentTableProps) {
                   {dept.name}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                {/* <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   <Badge
                     size="sm"
                     color={
@@ -161,7 +160,7 @@ export default function DepartmentTable({openModal}: DepartmentTableProps) {
                   >
                     {dept.status}
                   </Badge>
-                </TableCell>
+                </TableCell> */}
 
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                  {dept.action}

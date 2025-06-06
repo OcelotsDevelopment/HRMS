@@ -4,6 +4,7 @@ import LayoutContent from "./layout/LayoutContent";
 import Home from "./pages/home/Home";
 import SignInForm from "./pages/Auth/login/SignInForm";
 import ListDepartment from "./pages/department/ListDepartment";
+import ListUser from "./pages/user/ListUsers";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route element={<LayoutContent />}>
             <Route path="/" element={<Home />} />
             <Route path="/depart-managment" element={<ListDepartment />} />
+            <Route path="/user-management" element={<ListUser />} />
             {/* Add more routes as needed */}
           </Route>
 

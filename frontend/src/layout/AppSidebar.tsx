@@ -61,7 +61,7 @@ const navItems: NavItem[] = [
         />
       </svg>
     ),
-    name: "Calendar",
+    name: "Deparment",
     path: "/depart-managment",
   },
   {
@@ -81,8 +81,8 @@ const navItems: NavItem[] = [
         />
       </svg>
     ),
-    name: "User Profile",
-    path: "/profile",
+    name: "User Management",
+    path: "/user-management",
   },
   {
     name: "Forms",
