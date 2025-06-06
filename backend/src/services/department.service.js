@@ -61,7 +61,6 @@ export const getDepartmentByIdService = async (id) => {
 };
 
 export const updateDepartmentService = async (id, { name, headId }) => {
-  console.log(id, name, headId, "jsdfkjsdhfkjsdhfkjsdfhdkjh");
 
   try {
     const data = {
