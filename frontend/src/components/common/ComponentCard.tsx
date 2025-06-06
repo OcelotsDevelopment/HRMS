@@ -27,7 +27,8 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
         <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
           {title}
         </h3>
-        <Button onClick={handleButtonClick} >{buttonTitle}t</Button>
+        
+        {handleButtonClick &&<Button onClick={handleButtonClick} >{buttonTitle}t</Button>}
         {desc && (
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {desc}

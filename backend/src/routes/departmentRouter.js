@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-router.post("/add", addDepartment);
+router.post("/", addDepartment);
 router.get("/", getAllDepartments);
 router.get("/:id", getDepartmentById);
 router.put("/:id", updateDepartment);

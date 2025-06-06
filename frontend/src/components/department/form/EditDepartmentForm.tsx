@@ -1,29 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import Input from "../../input/InputField.tsx";
 import Label from "../../form-elements/Label.tsx";
 import { useDepartmentStore } from "../../../store/departmentStore.ts";
+import Loader from "../../common/Loader.tsx";
 
-export default function AddDepartmentForm() {
+interface EditDepartmentFormProps {
+  department: {
+    id: number;
+  };
+}
+
+export default function EditDepartmentForm({
+  department,
+}: EditDepartmentFormProps) {
   const [name, setName] = useState("");
   const [headId, setHeadId] = useState(0);
   const [errors, setErrors] = useState<{ name?: string; headId?: string }>({});
-  // const [successMessage, setSuccessMessage] = useState("");
 
-  // state of department
-
-  const addDepartment = useDepartmentStore((state) => state.addDepartment);
-
-
+  const updateDepartment = useDepartmentStore(
+    (state) => state.updateDepartment
+  );
   const error = useDepartmentStore((state) => state.error);
 
+  const getDepartmentById = useDepartmentStore(
+    (state) => state.getDepartmentById
+  );
+  const selectedDepartment = useDepartmentStore(
+    (state) => state.selectedDepartment
+  );
+  const loading = useDepartmentStore((state) => state.loading);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (department?.id) {
+        await getDepartmentById(department.id);
+      }
+    }
+
+    fetchData();
+  }, [department?.id, getDepartmentById]);
+
+  useEffect(() => {
+    if (selectedDepartment) {
+      setName(selectedDepartment?.name);
+      setHeadId(selectedDepartment?.headId)
+    }
+  }, [selectedDepartment]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
     if (!name.trim()) newErrors.name = "Department name is required.";
-    // if (!headId.trim()) newErrors.headId = "Head ID is required.";
-    // else if (!/^\d+$/.test(headId)) newErrors.headId = "Head ID must be a number.";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -31,14 +58,15 @@ export default function AddDepartmentForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    // setSuccessMessage("Your format is all correct, pleas÷e wait a moment.");
-    await addDepartment(name, headId);
+    await updateDepartment(department.id, name,headId);
   };
 
   return (
-    <ComponentCard title="Add Department" desc="">
+    <ComponentCard title="Edit Department" desc="">
+      {loading && <Loader />}
       <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-       {error && <p className="text-red-400">{error}</p>}
+        {error && <p className="text-red-400">{error}</p>}
+
         <div>
           <Label>Department Name</Label>
           <Input
@@ -67,12 +95,8 @@ export default function AddDepartmentForm() {
           type="submit"
           className="rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
         >
-          Create Department
+          Update Department
         </button>
-
-        {/* {successMessage && (
-          <p className="text-green-600 text-sm mt-2">{successMessage}</p>
-        )} */}
       </form>
     </ComponentCard>
   );

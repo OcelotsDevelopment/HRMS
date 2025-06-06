@@ -2,12 +2,27 @@ import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
 import PageMeta from "../../components/common/PageMeta";
 import DepartmentTable from "../../components/department/table/DepartmentTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../../components/ui/modal";
 import AddDepartmentForm from "../../components/department/form/AddForm";
+import { useDepartmentStore } from "../../store/departmentStore";
+import EditDepartmentForm from "../../components/department/form/EditDepartmentForm";
 
 export default function ListDepartment() {
   const [open, setOpen] = useState<boolean>(false);
+  const [openEdit, setOpenEdit] = useState<boolean>(false);
+  const [departmentId, setDepartmentId] = useState<number>();
+
+  const departments = useDepartmentStore((state) => state.departments);
+  
+
+  useEffect(() => {
+    if (departments) {
+      setOpen(false);
+      setOpenEdit(false);
+    }
+  }, [departments]);
+
   return (
     <>
       <PageMeta
@@ -21,7 +36,12 @@ export default function ListDepartment() {
           buttonTitle="Add Department"
           handleButtonClick={() => setOpen(true)}
         >
-          <DepartmentTable />
+          <DepartmentTable
+            openModal={(id) => {
+              setOpenEdit(true);
+              setDepartmentId(id);
+            }}
+          />
         </ComponentCard>
       </div>
 
@@ -31,8 +51,18 @@ export default function ListDepartment() {
         className="max-w-[700px] m-4"
       >
         {/* <div className="relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-11"> */}
-          <AddDepartmentForm />
+        <AddDepartmentForm />
         {/* </div> */}
+      </Modal>
+
+      <Modal
+        isOpen={openEdit}
+        onClose={() => setOpenEdit(false)}
+        className="max-w-[700px] m-4"
+      >
+        {departmentId !== undefined && (
+          <EditDepartmentForm department={{ id: departmentId }} />
+        )}
       </Modal>
     </>
   );

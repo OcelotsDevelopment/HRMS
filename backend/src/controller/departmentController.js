@@ -7,7 +7,7 @@ import {
 } from "../services/department.service.js";
 
 // @desc    Add new department
-// @route   POST /api/department/add
+// @route   POST /api/department/
 // @access  Public or Protected (depending on your middleware)
 export const addDepartment = asyncHandler(async (req, res) => {
   const result = await addDepartmentService(req.body);
