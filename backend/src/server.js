@@ -9,6 +9,7 @@ import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
 import departmentRouter from "./routes/departmentRouter.js"
 import adminRouter from "./routes/adminRouter.js"
+import employeeRouter from "./routes/employeeRouter.js"
 
 import { errorHandler, notFound } from "./middlewares/errorMiddlware.js";
 
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth/", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/employee/", employeeRouter);
 app.use("/api/department", departmentRouter);
 
 
