@@ -8,6 +8,7 @@ import sanitizedConfig from "./config.js";
 import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
 import departmentRouter from "./routes/departmentRouter.js"
+import adminRouter from "./routes/adminRouter.js"
 
 import { errorHandler, notFound } from "./middlewares/errorMiddlware.js";
 
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth/", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/department", departmentRouter);
 
 

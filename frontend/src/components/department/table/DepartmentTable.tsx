@@ -119,14 +119,14 @@ export default function DepartmentTable({openModal}: DepartmentTableProps) {
                 <TableCell className="px-5 py-4 sm:px-6 text-start">
                   {dept.head ? (
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 overflow-hidden rounded-full">
+                      {/* <div className="w-10 h-10 overflow-hidden rounded-full">
                         <img
                           width={40}
                           height={40}
                           // src={dept.head}
                           // alt={dept.head.name}
                         />
-                      </div>
+                      </div> */}
                       <div>
                         <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                           {dept.head.name}

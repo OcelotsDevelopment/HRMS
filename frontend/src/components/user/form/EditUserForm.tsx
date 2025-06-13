@@ -4,22 +4,34 @@ import Input from "../../input/InputField.tsx";
 import Label from "../../form-elements/Label.tsx";
 import { useUserStore } from "../../../store/userStore.ts";
 import Loader from "../../common/Loader.tsx";
+import Select from "../../form/Select.tsx";
+import { useDepartmentStore } from "../../../store/departmentStore.ts";
 
 interface EditUserFormProps {
   user: {
     id: number;
   };
 }
+interface Department {
+  value: number;
+  label: string;
+}
 
 export default function EditUserForm({ user }: EditUserFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [departmentId, setDepartmentId] = useState<number>(0);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; departmentId?: string }>({});
+  const [departmentOptions, setDepartmentOptions] = useState<Department[]>([]);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    departmentId?: string;
+  }>({});
 
   const updateUser = useUserStore((state) => state.updateUser);
   const getUserById = useUserStore((state) => state.getUserById);
   const selectedUser = useUserStore((state) => state.selectedUser);
+  const findDepartments = useDepartmentStore((state) => state.findDepartments);
   const error = useUserStore((state) => state.error);
   const loading = useUserStore((state) => state.loading);
 
@@ -31,18 +43,35 @@ export default function EditUserForm({ user }: EditUserFormProps) {
 
   useEffect(() => {
     if (selectedUser) {
+      console.log(
+        selectedUser,
+        "findDepartmentsfindDepartmentsfindDepartmentsfindDepartments"
+      );
+
       setName(selectedUser.name);
       setEmail(selectedUser.email);
-      setDepartmentId(selectedUser.departmentId);
+      setDepartmentId(selectedUser.headOf?.id ?? 0);
     }
   }, [selectedUser]);
+
+  useEffect(() => {
+    if (findDepartments && Array.isArray(findDepartments)) {
+      const formatted: Department[] = findDepartments.map((department) => ({
+        value: department.id,
+        label: department.name,
+      }));
+      setDepartmentOptions(formatted);
+    }
+  }, [findDepartments]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
     if (!name.trim()) newErrors.name = "Name is required.";
     if (!email.trim()) newErrors.email = "Email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Invalid email format.";
-    if (!departmentId || departmentId <= 0) newErrors.departmentId = "Department ID must be a positive number.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      newErrors.email = "Invalid email format.";
+    if (!departmentId || departmentId <= 0)
+      newErrors.departmentId = "Department ID must be a positive number.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -84,14 +113,22 @@ export default function EditUserForm({ user }: EditUserFormProps) {
         </div>
 
         <div>
-          <Label>Department ID</Label>
-          <Input
+          <Label>Department</Label>
+          {/* <Input
             type="number"
             value={departmentId}
             error={!!errors.departmentId}
             onChange={(e) => setDepartmentId(Number(e.target.value))}
             placeholder="Enter department ID"
             hint={errors.departmentId || ""}
+          /> */}
+
+          <Select
+            options={departmentOptions}
+            placeholder="Select an option"
+            onChange={(e) => setDepartmentId(Number(e))}
+            className="dark:bg-dark-900"
+            value={departmentId} // ✅ pass controlled value here
           />
         </div>
 

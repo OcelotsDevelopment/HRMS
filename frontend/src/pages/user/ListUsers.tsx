@@ -13,11 +13,7 @@ export default function ListUser() {
   const [openEdit, setOpenEdit] = useState(false);
   const [userId, setUserId] = useState<number>();
 
-  const { users, fetchUsers } = useUserStore();
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const { users } = useUserStore();
 
   useEffect(() => {
     if (users) {

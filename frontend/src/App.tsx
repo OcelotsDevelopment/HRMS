@@ -5,6 +5,7 @@ import Home from "./pages/home/Home";
 import SignInForm from "./pages/Auth/login/SignInForm";
 import ListDepartment from "./pages/department/ListDepartment";
 import ListUser from "./pages/user/ListUsers";
+import NotFound from "./pages/404/NotFound";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           </Route>
 
           <Route path="/signin" element={<SignInForm />} />
+           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>
