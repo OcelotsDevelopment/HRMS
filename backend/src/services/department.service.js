@@ -40,13 +40,43 @@ export const getAllDepartmentsService = async () => {
   }
 };
 
+export const getAllUsersWithDepartmentService = async (id) => {
+  try {
+    const departmentId = Number(id); 
+    const users = await prisma.user.findMany({
+     where: { departmentId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        departmentId: true, // ✅ include only departmentId
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return { users };
+  } catch (error) {
+    throw new Error(error.message || "Failed to fetch users with departments");
+  }
+};
+
+
 export const getDepartmentByIdService = async (id) => {
   try {
     const department = await prisma.department.findUnique({
       where: { id },
       include: {
-        head: true,
+        head: {
+          include: {
+            department: true,
+          },
+        },
         employees: true,
+        users: true, // ✅ fetch all users under this department
       },
     });
 
@@ -61,7 +91,6 @@ export const getDepartmentByIdService = async (id) => {
 };
 
 export const updateDepartmentService = async (id, { name, headId }) => {
-
   try {
     const data = {
       name,
@@ -73,7 +102,7 @@ export const updateDepartmentService = async (id, { name, headId }) => {
           }
         : {
             head: {
-              disconnect: true, 
+              disconnect: true,
             },
           }),
     };

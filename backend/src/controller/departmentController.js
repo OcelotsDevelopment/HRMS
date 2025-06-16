@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import {
   addDepartmentService,
   getAllDepartmentsService,
+  getAllUsersWithDepartmentService,
   getDepartmentByIdService,
   updateDepartmentService,
 } from "../services/department.service.js";
@@ -19,6 +20,14 @@ export const addDepartment = asyncHandler(async (req, res) => {
 // @access  Public or Protected
 export const getAllDepartments = asyncHandler(async (req, res) => {
   const result = await getAllDepartmentsService();
+  res.status(200).json(result);
+});
+
+// @desc    Get all users under department
+// @route   GET /api/usersDepartment
+// @access  Public or Protected
+export const getAllDepartmentUsers = asyncHandler(async (req, res) => {
+  const result = await getAllUsersWithDepartmentService(req.params.id);
   res.status(200).json(result);
 });
 

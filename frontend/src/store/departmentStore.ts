@@ -18,14 +18,30 @@ type Department = {
   };
 };
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  departmentId: number;
+  createdAt: string;
+  updatedAt: string;
+  headOf?: {
+    id: number;
+    name: string;
+  };
+};
+
 type DepartmentState = {
   departments: Department[];
   findDepartments: Department[];
+  findUserDepartments:User[]
   selectedDepartment: Department | null;
   loading: boolean;
   error: string | null;
 
   fetchDepartments: () => Promise<void>;
+  fetchUsersDepartment: (id: number) => Promise<void>;
   addDepartment: (name: string, headId: number) => Promise<void>;
   updateDepartment: (id: number, name: string, headId: number) => Promise<void>;
   getDepartmentById: (id: number) => Promise<void>;
@@ -36,6 +52,7 @@ export const useDepartmentStore = create<DepartmentState>()(
     (set) => ({
       departments: [],
       findDepartments: [],
+      findUserDepartments:[],
       selectedDepartment: null,
       loading: false,
       error: null,
@@ -48,6 +65,19 @@ export const useDepartmentStore = create<DepartmentState>()(
             headers: { Authorization: `Bearer ${token}` },
           });
           set({ findDepartments: res.data?.departments, loading: false });
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+       fetchUsersDepartment: async (id) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          const res = await api.get(`/department/fetchUser/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          set({ findUserDepartments: res.data?.users, loading: false });
         } catch (err) {
           handleError(err, set);
         }

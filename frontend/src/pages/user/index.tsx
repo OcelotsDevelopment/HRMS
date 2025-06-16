@@ -1,12 +1,12 @@
-import PageMeta from "../../components/common/PageMeta";
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import ComponentCard from "../../components/common/ComponentCard";
+import PageMeta from "../../components/common/PageMeta.tsx";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb.tsx";
+import ComponentCard from "../../components/common/ComponentCard.tsx";
 import { useUserStore } from "../../store/userStore.ts";
 import { useEffect, useState } from "react";
-import { Modal } from "../../components/ui/modal";
+import { Modal } from "../../components/ui/modal/index.tsx";
 import UserTable from "../../components/user/table/UserTable.tsx";
 import EditUserForm from "../../components/user/form/EditUserForm.tsx";
-import AddUserForm from "../../components/user/form/AddUserForm";
+import AddUserForm from "../../components/user/form/AddUserForm.tsx";
 
 export default function ListUser() {
   const [open, setOpen] = useState(false);

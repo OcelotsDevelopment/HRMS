@@ -109,6 +109,7 @@ export default function AddUserForm() {
             placeholder="Select an option"
             onChange={(e) => setDepartmentId(Number(e))}
             className="dark:bg-dark-900"
+            value={departmentId}
           />
         </div>
 

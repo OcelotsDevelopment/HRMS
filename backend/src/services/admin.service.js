@@ -24,7 +24,8 @@ export const createUserService = async ({ name, email, departmentId }) => {
       name,
       email,
       password: hashedPassword,
-      role: departmentFind?.name, // or dynamic role
+      role: departmentFind?.name,
+      departmentId: departmentFind?.id,
       headOf: {
         connect: {
           id: departmentId,
@@ -38,17 +39,14 @@ export const createUserService = async ({ name, email, departmentId }) => {
 
 // List Users
 export const listUsersService = async () => {
-
   return await prisma.user.findMany({
-  include: {
-    headOf: true, // includes department if user is a department head
-  },
-  orderBy: {
-    createdAt: 'desc', // sort by 'createdAt' in ascending order
-  },
-});
-
-
+    include: {
+      headOf: true, // includes department if user is a department head
+    },
+    orderBy: {
+      createdAt: "desc", // sort by 'createdAt' in ascending order
+    },
+  });
 };
 
 // Find By Id
@@ -82,6 +80,7 @@ export const editUserService = async (id, { name, email, departmentId }) => {
       name,
       email,
       role: departmentFind?.name,
+      departmentId: departmentFind?.id,
       headOf: departmentId
         ? {
             connect: { id: departmentId },

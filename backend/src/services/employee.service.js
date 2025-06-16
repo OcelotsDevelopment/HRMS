@@ -1,4 +1,14 @@
 import { prisma } from "../config/db.js";
+
+function isValidDate(input) {
+  const date = new Date(input);
+  return (
+    !isNaN(date.getTime()) &&
+    date.getFullYear() > 1900 &&
+    date.getFullYear() < 2100
+  );
+}
+
 export const createEmployeeService = async (data) => {
   try {
     let {
@@ -23,6 +33,7 @@ export const createEmployeeService = async (data) => {
 
       // 3. Job Details
       departmentId,
+      coordinatorId,
       employeeCode,
       dateOfJoining,
       position,
@@ -53,17 +64,19 @@ export const createEmployeeService = async (data) => {
     const existingEmployee = await prisma.employee.findUnique({
       where: { email },
     });
+
     if (existingEmployee) {
       throw new Error("Employee already exists");
     }
 
+    // Optional validation
+    const department = departmentId
+      ? await prisma.department.findUnique({ where: { id: departmentId } })
+      : null;
 
-    const department = await prisma.department.findUnique({
-  where: { id: departmentId },
-});
-
-
-
+    const coordinator = coordinatorId
+      ? await prisma.user.findUnique({ where: { id: coordinatorId } })
+      : null;
 
     const employee = await prisma.employee.create({
       data: {
@@ -72,7 +85,7 @@ export const createEmployeeService = async (data) => {
         mobile,
         designation,
         sex,
-        dob: dob ? new Date(dob) : null,
+        dob: dob && isValidDate(dob) ? new Date(dob) : null,
         age,
         placeOfBirth,
         height,
@@ -85,8 +98,13 @@ export const createEmployeeService = async (data) => {
         permanentAddress,
 
         departmentId: department ? department.id : null,
+        coordinatorId: coordinator ? coordinator.id : null, // ✅ new line
+
         employeeCode,
-        dateOfJoining,
+        dateOfJoining:
+          dateOfJoining && isValidDate(dateOfJoining)
+            ? new Date(dateOfJoining)
+            : null,
         position,
         salaryOnJoining,
         reportingTo,
@@ -115,38 +133,34 @@ export const createEmployeeService = async (data) => {
 
     return { employee };
   } catch (error) {
-    console.log(error, "ererorereorererererldjof");
-    throw new Error(error);
+    console.error("Error creating employee:", error);
+    throw new Error(error.message || "Failed to create employee");
   }
 };
 
 export const getAllEmployeesService = async () => {
   const employees = await prisma.employee.findMany({
     include: {
-      department: {
-        include: {
-          head: true, // include the department's head (User)
-        },
-      },
+      department: true,
+      coordinator: true, // ✅ include coordinator (User)
       qualifications: true,
       employments: true,
       references: true,
     },
-
     orderBy: {
-    createdAt: 'desc', // sort by 'createdAt' in ascending order
-  },
+      createdAt: "desc", // ✅ descending = newest first
+    },
   });
 
   return { employees };
 };
-
 
 export const getEmployeeByIdService = async (id) => {
   const employee = await prisma.employee.findUnique({
     where: { id },
     include: {
       department: true,
+      coordinator: true,
       qualifications: true,
       employments: true,
       references: true,
@@ -162,10 +176,36 @@ export const getEmployeeByIdService = async (id) => {
 
 export const updateEmployeeService = async (id, data) => {
   try {
-    if (data.dob) {
-      data.dob = new Date(data.dob);
+    // ✅ Validate and convert DOB
+    if (data.dob && !isValidDate(data.dob))
+      throw new Error("Invalid date of birth");
+    if (data.dob) data.dob = new Date(data.dob);
+
+    if (data.dateOfJoining && !isValidDate(data.dateOfJoining))
+      throw new Error("Invalid date of joining");
+    if (data.dateOfJoining) data.dateOfJoining = new Date(data.dateOfJoining);
+
+    // ✅ Validate coordinatorId
+    if (data.coordinatorId) {
+      const coordinatorExists = await prisma.user.findUnique({
+        where: { id: data.coordinatorId },
+      });
+      if (!coordinatorExists) {
+        throw new Error("Coordinator not found");
+      }
     }
 
+    // ✅ Validate departmentId
+    if (data.departmentId) {
+      const departmentExists = await prisma.department.findUnique({
+        where: { id: data.departmentId },
+      });
+      if (!departmentExists) {
+        throw new Error("Department not found");
+      }
+    }
+
+    // ✅ Update the employee
     const employee = await prisma.employee.update({
       where: { id },
       data,
@@ -174,7 +214,6 @@ export const updateEmployeeService = async (id, data) => {
     return { employee };
   } catch (error) {
     console.error("Update Error:", error);
-    throw new Error("Failed to update employee");
+    throw new Error(error.message || "Failed to update employee");
   }
 };
-
