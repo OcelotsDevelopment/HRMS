@@ -7,6 +7,7 @@ import ListDepartment from "./pages/department/ListDepartment";
 import ListUser from "./pages/user";
 import NotFound from "./pages/404/NotFound";
 import ListEmployee from "./pages/employee";
+import EmployeeProfiles from "./pages/employee/EmployeeDetails/EmployeeProfile";
 // import AddEmployeeForm from "./components/employee/form/AddEmployeeForm";
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
 
             {/* employee managment */}
             <Route path="/employee-management" element={<ListEmployee />} />
-            {/* <Route path="/add-employee" element={<AddEmployeeForm />} /> */}
+            <Route path="/employee-management/add-details/:id" element={<EmployeeProfiles />} />
 
             {/* Add more routes as needed */}
           </Route>

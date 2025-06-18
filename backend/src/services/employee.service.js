@@ -176,6 +176,8 @@ export const getEmployeeByIdService = async (id) => {
 
 export const updateEmployeeService = async (id, data) => {
   try {
+    console.log(data, "datastataatattatatatsatstasdaydaydadatadtadt");
+
     // ✅ Validate and convert DOB
     if (data.dob && !isValidDate(data.dob))
       throw new Error("Invalid date of birth");
@@ -216,4 +218,62 @@ export const updateEmployeeService = async (id, data) => {
     console.error("Update Error:", error);
     throw new Error(error.message || "Failed to update employee");
   }
+};
+
+// Add employment
+export const addEmploymentService = async (data) => {
+  console.log(data, "datadatadatadatadatadatadata");
+
+  const employee = await prisma.employee.findUnique({
+    where: { id: data?.employeeId },
+  });
+  if (!employee) throw new Error("Employee not found");
+
+  const employment = await prisma.employment.create({
+    data: {
+      ...data,
+      workedFrom: new Date(data.workedFrom),
+      workedTill: new Date(data.workedTill),
+      employeeId: data?.employeeId,
+    },
+  });
+
+  return { employment };
+};
+
+// List all employments for an employee
+export const listEmploymentService = async (employeeId) => {
+  const employments = await prisma.employment.findMany({
+    where: { employeeId },
+    orderBy: { workedFrom: "desc" },
+  });
+  return { employments };
+};
+
+// Get employment by ID
+export const getEmploymentByIdService = async (id) => {
+  const employment = await prisma.employment.findUnique({
+    where: { id },
+  });
+  if (!employment) throw new Error("Employment not found");
+  return { employment };
+};
+
+// Update employment
+export const updateEmploymentService = async (id, data) => {
+  const employment = await prisma.employment.update({
+    where: { id },
+    data: {
+      ...data,
+      workedFrom: data.workedFrom ? new Date(data.workedFrom) : undefined,
+      workedTill: data.workedTill ? new Date(data.workedTill) : undefined,
+    },
+  });
+  return { employment };
+};
+
+// Delete employment
+export const deleteEmploymentService = async (id) => {
+  await prisma.employment.delete({ where: { id } });
+  return { message: "Employment deleted successfully" };
 };

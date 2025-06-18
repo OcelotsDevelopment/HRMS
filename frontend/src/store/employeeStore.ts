@@ -3,7 +3,6 @@ import { persist } from "zustand/middleware";
 import { api } from "../services/api";
 import axios from "axios";
 
-
 type Department = {
   id: number;
   name: string;
@@ -19,11 +18,11 @@ type Department = {
 };
 
 type User = {
- id: number;
+  id: number;
   name: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 type Qualification = {
   id?: number;
@@ -34,7 +33,7 @@ type Qualification = {
 };
 
 type Employment = {
-  id?: number;
+  employeeId?: number;
   employerName: string;
   positionHeld: string;
   location: string;
@@ -71,9 +70,9 @@ type Employee = {
   currentAddress?: string;
   permanentAddress?: string;
   departmentId?: number;
-  coordinatorId?:number;
-  coordinator?:User;
-  department:Department;
+  coordinatorId?: number;
+  coordinator?: User;
+  department: Department;
   employeeCode?: string;
   dateOfJoining?: string;
   position?: string;
@@ -96,6 +95,7 @@ type Employee = {
 type EmployeeState = {
   employees: Employee[];
   selectedEmployee: Employee | null;
+  employments:Employment[] | [];
   loading: boolean;
   error: string | null;
 
@@ -103,6 +103,16 @@ type EmployeeState = {
   getEmployeeById: (id: number) => Promise<void>;
   createEmployee: (data: Partial<Employee>) => Promise<void>;
   updateEmployee: (id: number, data: Partial<Employee>) => Promise<void>;
+
+  // Employeement
+  addEmployment: (data: Employment) => Promise<void>;
+  updateEmployment: (
+    employeeId: number,
+    empId: number,
+    data: Employment
+  ) => Promise<void>;
+  deleteEmployment: (employeeId: number, empId: number) => Promise<void>;
+  fetchEmployments: (employeeId: number) => Promise<void>;
 };
 
 export const useEmployeeStore = create<EmployeeState>()(
@@ -110,19 +120,19 @@ export const useEmployeeStore = create<EmployeeState>()(
     (set) => ({
       employees: [],
       selectedEmployee: null,
+      employments: [],
       loading: false,
       error: null,
 
       fetchEmployees: async () => {
-        
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem("auth_token");
           const res = await api.get("/employee", {
             headers: { Authorization: `Bearer ${token}` },
           });
-          console.log(res.data,"jksdhfksdhfkasdhfkjsdhfkdjh");
-          
+          console.log(res.data, "jksdhfksdhfkasdhfkjsdhfkdjh");
+
           set({ employees: res.data.employees, loading: false });
         } catch (err) {
           handleError(err, set);
@@ -143,7 +153,6 @@ export const useEmployeeStore = create<EmployeeState>()(
       },
 
       createEmployee: async (data) => {
-        
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem("auth_token");
@@ -157,7 +166,7 @@ export const useEmployeeStore = create<EmployeeState>()(
       },
 
       updateEmployee: async (id, data) => {
-         console.log(data,"da====================sdfs============");
+        console.log(data, "da====================sdfs============");
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem("auth_token");
@@ -167,6 +176,66 @@ export const useEmployeeStore = create<EmployeeState>()(
           await useEmployeeStore.getState().fetchEmployees();
         } catch (err) {
           handleError(err, set);
+        }
+      },
+
+      // Employment
+      addEmployment: async (data) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          await api.post(`/employee/employment`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          await useEmployeeStore.getState().getEmployeeById(Number(data?.employeeId));
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      updateEmployment: async (employeeId, empId, data) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          await api.put(`/employee/${employeeId}/employments/${empId}`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          await useEmployeeStore.getState().getEmployeeById(employeeId);
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      deleteEmployment: async (employeeId, empId) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          await api.delete(`/employee/${employeeId}/employments/${empId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          await useEmployeeStore.getState().getEmployeeById(employeeId);
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      fetchEmployments: async (employeeId) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          const res = await api.get(`/employee/employments/${employeeId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          set({ employments: res.data?.employments, loading: false });
+        } catch (err) {
+          if (axios.isAxiosError(err)) {
+            set({
+              error: err.response?.data?.message || "Failed to fetch",
+              loading: false,
+            });
+          } else {
+            set({ error: "Unknown error occurred", loading: false });
+          }
         }
       },
     }),
