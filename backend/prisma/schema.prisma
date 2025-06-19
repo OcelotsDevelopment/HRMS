@@ -7,39 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id            Int         @id @default(autoincrement())
-  name          String
-  email         String       @unique
-  password      String
-  role          String
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     String
 
-  departmentId  Int?         // ✅ must exist
-  department    Department?  @relation("DepartmentUsers", fields: [departmentId], references: [id])
-  headOf        Department?  @relation("DepartmentHead")
-  employees     Employee[]   @relation("UserCoordinator")
+  departmentId Int? // ✅ must exist
+  department   Department? @relation("DepartmentUsers", fields: [departmentId], references: [id])
+  headOf       Department? @relation("DepartmentHead")
+  employees    Employee[]  @relation("UserCoordinator")
 
-  createdAt     DateTime     @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Department {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
-  headId     Int?      @unique
-  head       User?     @relation("DepartmentHead", fields: [headId], references: [id])
-  users      User[]    @relation("DepartmentUsers") // ✅ all users in the department
-  employees  Employee[]
-  
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  headId    Int?       @unique
+  head      User?      @relation("DepartmentHead", fields: [headId], references: [id])
+  users     User[]     @relation("DepartmentUsers") // ✅ all users in the department
+  employees Employee[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Employee {
-  id               Int                  @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   name             String
-  email            String               @unique
+  email            String    @unique
   mobile           String?
   designation      String?
   sex              String?
@@ -51,73 +50,111 @@ model Employee {
   bloodGroup       String?
   nationality      String?
   maritalStatus    String?
+
   currentAddress   String?
+  currentPinCode   String?   
+
   permanentAddress String?
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
+  permanentPinCode String?   
+
+  profileImageUrl  String?  
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Foreign Keys
   departmentId     Int?
-  department       Department?          @relation(fields: [departmentId], references: [id])
+  department       Department? @relation(fields: [departmentId], references: [id])
 
-coordinatorId Int?
-coordinator   User? @relation("UserCoordinator", fields: [coordinatorId], references: [id])
+  coordinatorId    Int?
+  coordinator      User? @relation("UserCoordinator", fields: [coordinatorId], references: [id])
 
-
-  qualifications   Qualification[]     
-  employments      Employment[]         
-  references       Reference[]          
+  qualifications   Qualification[]
+  employments      Employment[]
+  references       Reference[]
+  payroll          Payroll[]
 
   // Legal/Personal Info
-  liabilitiesDetails     String?
-  familyBackground       String?
-  hasFamilyBusiness      Boolean? @default(false)
-  familyBusinessDetails  String?
-  isPhysicallyImpaired   Boolean? @default(false)
-  impairmentDetails      String?
+  liabilitiesDetails    String?
+  familyBackground      String?
+  hasFamilyBusiness     Boolean? @default(false)
+  familyBusinessDetails String?
+  isPhysicallyImpaired  Boolean? @default(false)
+  impairmentDetails     String?
 
   // Admin fields
-  employeeCode      String?     @unique
-  dateOfJoining     DateTime?
-  position          String?
-  salaryOnJoining   Float?
-  reportingTo       String?
-  hiredBy           String?
-  replacementOf     String?
-  isRehire          Boolean?    @default(false)
+  employeeCode    String?   @unique
+  dateOfJoining   DateTime?
+  position        String?
+  salaryOnJoining Float?
+  reportingTo     String?
+  hiredBy         String?
+  replacementOf   String?
+  isRehire        Boolean?  @default(false)
 }
 
 
 model Qualification {
-  id           Int       @id @default(autoincrement())
-  employeeId   Int
-  standard     String
-  fromYear     Int
-  toYear       Int
-  percentage   Float?
-  employee     Employee  @relation(fields: [employeeId], references: [id])
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  standard   String   @unique
+  fromYear   Int
+  toYear     Int
+  percentage Float?
+  employee   Employee @relation(fields: [employeeId], references: [id])
 }
 
 model Employment {
-  id                 Int      @id @default(autoincrement())
-  employeeId         Int
-  employerName       String
-  positionHeld       String
-  location           String
-  workedFrom         DateTime
-  workedTill         DateTime
-  lastSalaryDrawn    Float?
-  reasonForLeaving   String?
-  remarks            String?
-  employee           Employee @relation(fields: [employeeId], references: [id])
+  id               Int      @id @default(autoincrement())
+  employeeId       Int
+  employerName     String
+  positionHeld     String
+  location         String
+  workedFrom       DateTime
+  workedTill       DateTime
+  lastSalaryDrawn  Float?
+  reasonForLeaving String?
+  remarks          String?
+  employee         Employee @relation(fields: [employeeId], references: [id])
 }
 
 model Reference {
-  id               Int      @id @default(autoincrement())
-  employeeId       Int
-  name             String
-  positionHeld     String
-  organization     String
-  contact          String
-  employee         Employee @relation(fields: [employeeId], references: [id])
+  id           Int      @id @default(autoincrement())
+  employeeId   Int
+  name         String
+  positionHeld String
+  organization String
+  contact      String
+  employee     Employee @relation(fields: [employeeId], references: [id])
+}
+
+// payroll
+model Payroll {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  month Int // 1 to 12
+  year  Int // e.g., 2025
+
+  baseSalary      Float // Basic Salary
+  hra             Float // House Rent Allowance
+  otherAllowances Float? // Travel, food etc.
+  grossSalary     Float // base + hra + otherAllowances
+
+  epf             Float? // Provident Fund
+  esi             Float? // Employee State Insurance
+  taxDeduction    Float? // TDS, Professional Tax etc.
+  totalDeductions Float // sum of all deductions
+
+  netPay Float // gross - deductions
+
+  paymentDate DateTime? // When payment was made
+  isPaid      Boolean   @default(false)
+
+  remarks String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+   @@unique([employeeId, month, year])
 }

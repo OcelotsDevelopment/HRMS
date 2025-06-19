@@ -1,21 +1,32 @@
-// EmploymentFrom.tsx
-import React, { useState } from "react";
+// EditEmploymentForm.tsx
+import React, { useEffect, useState } from "react";
 import Label from "../../../../form/Label";
 import Input from "../../../../input/InputField";
 import TextArea from "../../../../input/TextArea";
 import Button from "../../../../ui/button/Button";
 import { useModal } from "../../../../../hooks/useModal";
 import { useEmployeeStore } from "../../../../../store/employeeStore";
-import { useParams } from "react-router-dom";
 
-export default function EmploymentFrom() {
+interface EditEmploymentFormProps {
+  employmentId: number;
+  onSuccess?: () => void;
+}
+
+export default function EditEmploymentForm({
+  employmentId,
+  onSuccess,
+}: EditEmploymentFormProps) {
   const { closeModal } = useModal();
-
-  const { id } = useParams();
-
+  const fetchEmploymentById = useEmployeeStore(
+    (state) => state.getEmploymentById
+  );
+  const updateEmployment = useEmployeeStore((state) => state.updateEmployment);
+  const selectedEmployment = useEmployeeStore(
+    (state) => state.selectedEmployment
+  );
 
   const [form, setForm] = useState({
-    // id:0,
+    id: 0,
     employerName: "",
     positionHeld: "",
     location: "",
@@ -28,9 +39,31 @@ export default function EmploymentFrom() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  useEffect(() => {
+    fetchEmploymentById(employmentId);
+  }, [employmentId, fetchEmploymentById]);
+
+  useEffect(() => {
+    if (selectedEmployment) {
+      setForm({
+        id: selectedEmployment.id || 0,
+        employerName: selectedEmployment.employerName || "",
+        positionHeld: selectedEmployment.positionHeld || "",
+        location: selectedEmployment.location || "",
+        workedFrom:
+          selectedEmployment.workedFrom?.substring(0, 10) || "",
+        workedTill:
+          selectedEmployment.workedTill?.substring(0, 10) || "",
+        lastSalaryDrawn:
+          selectedEmployment.lastSalaryDrawn?.toString() || "",
+        reasonForLeaving:
+          selectedEmployment.reasonForLeaving || "",
+        remarks: selectedEmployment.remarks || "",
+      });
+    }
+  }, [selectedEmployment]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -40,38 +73,39 @@ export default function EmploymentFrom() {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.employerName.trim()) newErrors.employerName = "Employer Name is required.";
-    if (!form.positionHeld.trim()) newErrors.positionHeld = "Position Held is required.";
+    if (!form.employerName.trim())
+      newErrors.employerName = "Employer Name is required.";
+    if (!form.positionHeld.trim())
+      newErrors.positionHeld = "Position Held is required.";
     return newErrors;
   };
 
-  const addEmployment = useEmployeeStore((state) => state.addEmployment);
-//   const selectedEmployee = useEmployeeStore((state) => state.selectedEmployee);
-
-  const handleEmploymentSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    if (!id) return alert("No employee selected");
-
     try {
-      await addEmployment({
+      await updateEmployment(employmentId, {
         ...form,
-        lastSalaryDrawn: Number(form.lastSalaryDrawn) ? Number(form.lastSalaryDrawn) : undefined,
-        employeeId:Number(id)
+        lastSalaryDrawn: form.lastSalaryDrawn
+          ? Number(form.lastSalaryDrawn)
+          : undefined,
+        workedFrom: form.workedFrom,
+        workedTill: form.workedTill,
       });
+      if (onSuccess) onSuccess();
       closeModal();
     } catch (err) {
-      console.error("Error saving employment:", err);
+      console.error("Error updating employment:", err);
     }
   };
 
   return (
-    <form className="flex flex-col" onSubmit={handleEmploymentSubmit}>
+    <form className="flex flex-col" onSubmit={handleSubmit}>
       <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-        Employment Details
+        Edit Employment Details
       </h5>
 
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -144,7 +178,7 @@ export default function EmploymentFrom() {
           <Input
             type="text"
             name="reasonForLeaving"
-            placeholder="State reason"
+            placeholder="Enter reason for leaving"
             value={form.reasonForLeaving}
             onChange={handleChange}
           />
@@ -162,12 +196,10 @@ export default function EmploymentFrom() {
       </div>
 
       <div className="flex items-center gap-3 px-2 mt-6 justify-end">
-        <Button size="sm" variant="outline" onClick={closeModal} >
-          Close
+        <Button size="sm" variant="outline" onClick={closeModal}>
+          Cancel
         </Button>
-        <Button size="sm">
-          Save Employment
-        </Button>
+        <Button size="sm">Update Employment</Button>
       </div>
     </form>
   );

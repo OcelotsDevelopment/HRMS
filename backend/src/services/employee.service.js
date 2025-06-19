@@ -176,7 +176,6 @@ export const getEmployeeByIdService = async (id) => {
 
 export const updateEmployeeService = async (id, data) => {
   try {
-    console.log(data, "datastataatattatatatsatstasdaydaydadatadtadt");
 
     // ✅ Validate and convert DOB
     if (data.dob && !isValidDate(data.dob))
@@ -253,22 +252,36 @@ export const listEmploymentService = async (employeeId) => {
 // Get employment by ID
 export const getEmploymentByIdService = async (id) => {
   const employment = await prisma.employment.findUnique({
-    where: { id },
+    where: { id: Number(id) },
   });
-  if (!employment) throw new Error("Employment not found");
+
+  if (!employment) {
+    throw new Error("Employment not found");
+  }
+
   return { employment };
 };
 
 // Update employment
 export const updateEmploymentService = async (id, data) => {
+  if (isNaN(id)) {
+    throw new Error("Employment ID must be a valid number");
+  }
+
   const employment = await prisma.employment.update({
-    where: { id },
+    where: { id: id },
     data: {
-      ...data,
-      workedFrom: data.workedFrom ? new Date(data.workedFrom) : undefined,
-      workedTill: data.workedTill ? new Date(data.workedTill) : undefined,
+      employerName: data.employerName || "",
+      positionHeld: data.positionHeld || "",
+      location: data.location || "",
+      workedFrom: data.workedFrom ? new Date(data.workedFrom) : null,
+      workedTill: data.workedTill ? new Date(data.workedTill) : null,
+      lastSalaryDrawn: data.lastSalaryDrawn ?? null,
+      reasonForLeaving: data.reasonForLeaving || null,
+      remarks: data.remarks || null,
     },
   });
+
   return { employment };
 };
 
@@ -276,4 +289,217 @@ export const updateEmploymentService = async (id, data) => {
 export const deleteEmploymentService = async (id) => {
   await prisma.employment.delete({ where: { id } });
   return { message: "Employment deleted successfully" };
+};
+
+//            {// qualification}
+
+// Add qualification
+export const addQualificationService = async (data) => {
+  const employee = await prisma.employee.findUnique({
+    where: { id: data?.employeeId },
+  });
+  if (!employee) throw new Error("Employee not found");
+
+  const findQual = await prisma.qualification.findUnique({
+    where: { standard: data.standard },
+  });
+
+  if (findQual) throw new Error("This Qualification Already Exist");
+
+  const qualification = await prisma.qualification.create({
+    data: {
+      employeeId: data.employeeId,
+      standard: data.standard,
+      fromYear: data.fromYear,
+      toYear: data.toYear,
+      percentage: data.percentage ?? null,
+    },
+  });
+
+  return { qualification };
+};
+
+// List qualifications by employeeId
+export const listQualificationService = async (employeeId) => {
+  const qualifications = await prisma.qualification.findMany({
+    where: { employeeId },
+    orderBy: { fromYear: "desc" },
+  });
+  return { qualifications };
+};
+
+// Get qualification by ID
+export const getQualificationByIdService = async (id) => {
+  const qualification = await prisma.qualification.findUnique({
+    where: { id },
+  });
+  if (!qualification) {
+    throw new Error("Qualification not found");
+  }
+  return { qualification };
+};
+
+// Update qualification
+export const updateQualificationService = async (id, data) => {
+  const findQual = await prisma.qualification.findUnique({
+    where: { standard: data.standard },
+  });
+
+  if (findQual) throw new Error("This Qualification Already Exist");
+
+  const qualification = await prisma.qualification.update({
+    where: { id },
+    data: {
+      standard: data.standard,
+      fromYear: data.fromYear,
+      toYear: data.toYear,
+      percentage: data.percentage ?? null,
+    },
+  });
+  return { qualification };
+};
+
+//              {Payroll}
+
+// Create Payroll
+export const createPayrollService = async (data) => {
+  try {
+    const {
+      employeeId,
+      month,
+      year,
+      baseSalary,
+      hra,
+      otherAllowances,
+      epf,
+      esi,
+      taxDeduction,
+      paymentDate,
+      isPaid,
+      remarks,
+    } = data;
+
+    // Gross Salary Calculation
+    const grossSalary = baseSalary + hra + (otherAllowances ?? 0);
+
+    // Total Deductions
+    const totalDeductions = (epf ?? 0) + (esi ?? 0) + (taxDeduction ?? 0);
+
+    // Net Pay
+    const netPay = grossSalary - totalDeductions;
+
+    const employee = await prisma.employee.findUnique({
+      where: { id: data.employeeId },
+    });
+
+    if (!employee) {
+      throw new Error("Employee not found");
+    }
+
+    const payroll = await prisma.payroll.create({
+      data: {
+        employeeId,
+        month,
+        year,
+        baseSalary,
+        hra,
+        otherAllowances,
+        grossSalary,
+        epf,
+        esi,
+        taxDeduction,
+        totalDeductions,
+        netPay,
+        paymentDate: paymentDate ? new Date(paymentDate) : null,
+        isPaid: isPaid ?? false,
+        remarks: remarks ?? "",
+      },
+    });
+
+    return { payroll };
+  } catch (error) {
+
+    console.log(error,"asdlfkjalskdflakdfhjldkj");
+    
+    if (error.code === "P2002") {
+      throw new Error("Payroll already exists for this month and employee.");
+    }
+
+    throw new Error(error);
+  }
+};
+
+// Get Payroll by ID
+export const getPayrollByIdService = async (id) => {
+  const payroll = await prisma.payroll.findUnique({
+    where: { id },
+  });
+
+  if (!payroll) {
+    throw new Error("Payroll not found");
+  }
+
+  return { payroll };
+};
+
+// List Payrolls by Employee
+export const getPayrollsByEmployeeService = async (employeeId) => {
+
+  
+  const payrolls = await prisma.payroll.findMany({
+    where: { employeeId },
+    orderBy: { createdAt: "desc" }, // Or paymentDate
+  });
+
+  return { payrolls };
+};
+
+// Update Payroll
+export const updatePayrollService = async (id, data) => {
+  const {
+    baseSalary,
+    hra,
+    otherAllowances,
+    epf,
+    esi,
+    taxDeduction,
+    paymentDate,
+    isPaid,
+    remarks,
+  } = data;
+
+  const grossSalary = baseSalary + hra + (otherAllowances ?? 0);
+
+  const totalDeductions = (epf ?? 0) + (esi ?? 0) + (taxDeduction ?? 0);
+
+  const netPay = grossSalary - totalDeductions;
+
+  const payroll = await prisma.payroll.update({
+    where: { id },
+    data: {
+      baseSalary,
+      hra,
+      otherAllowances,
+      grossSalary,
+      epf,
+      esi,
+      taxDeduction,
+      totalDeductions,
+      netPay,
+      paymentDate: paymentDate ? new Date(paymentDate) : null,
+      isPaid,
+      remarks,
+    },
+  });
+
+  return { payroll };
+};
+
+// Delete Payroll
+export const deletePayrollService = async (id) => {
+  await prisma.payroll.delete({
+    where: { id },
+  });
+
+  return { message: "Payroll deleted successfully" };
 };

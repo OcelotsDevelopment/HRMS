@@ -28,19 +28,14 @@ export default function EmployeeProfiles() {
     coordinator: "",
   });
 
-  const { selectedEmployee, getEmployeeById,employees } = useEmployeeStore();
+  const { selectedEmployee, getEmployeeById, employees } = useEmployeeStore();
 
   useEffect(() => {
     getEmployeeById(Number(id));
-  }, [getEmployeeById, id,employees]);
+  }, [getEmployeeById, id, employees]);
 
   useEffect(() => {
     if (selectedEmployee) {
-      console.log(
-        selectedEmployee,
-        "selectedEmployeeselectedEmployeeselectedEmployeeselectedEmployee"
-      );
-
       setForm({
         name: selectedEmployee.name || "",
         email: selectedEmployee.email || "",
