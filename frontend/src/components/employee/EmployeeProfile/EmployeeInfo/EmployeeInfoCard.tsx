@@ -1,4 +1,4 @@
-import { Tabs } from "../EmployeeDetailsTabs";
+import { Tabs } from "../../../ui/tab/Tabs";
 import EmploymentInfo from "./Employment/EmploymentInfo";
 import PayrollInfo from "./Payroll/PayrollInfo";
 import QualificationInfo from "./Qualification/QualificationInfo";

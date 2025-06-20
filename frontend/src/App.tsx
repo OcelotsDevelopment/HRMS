@@ -6,8 +6,11 @@ import SignInForm from "./pages/Auth/login/SignInForm";
 import ListDepartment from "./pages/department/ListDepartment";
 import ListUser from "./pages/user";
 import NotFound from "./pages/404/NotFound";
-import ListEmployee from "./pages/employee";
+import ListEmployee from "./pages/employee/ListEmployee";
 import EmployeeProfiles from "./pages/employee/EmployeeDetails/EmployeeProfile";
+import Calendar from "./pages/Calendar";
+import Setting from "./pages/setting/Setting";
+import ListHoliday from "./pages/holiday/ListHoliday";
 // import AddEmployeeForm from "./components/employee/form/AddEmployeeForm";
 
 function App() {
@@ -22,7 +25,22 @@ function App() {
 
             {/* employee managment */}
             <Route path="/employee-management" element={<ListEmployee />} />
-            <Route path="/employee-management/add-details/:id" element={<EmployeeProfiles />} />
+            <Route
+              path="/employee-management/add-details/:id"
+              element={<EmployeeProfiles />}
+            />
+
+            {/* workforce */}
+
+            
+            <Route path="/holiday" element={<ListHoliday />} />
+
+
+            {/* SETTINGS */}
+            <Route path="/settings" element={<Setting />} />
+
+            {/* Calendar */}
+            <Route path="/Calendar" element={<Calendar />} />
 
             {/* Add more routes as needed */}
           </Route>

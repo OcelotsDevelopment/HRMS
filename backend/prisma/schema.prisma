@@ -36,43 +36,43 @@ model Department {
 }
 
 model Employee {
-  id               Int       @id @default(autoincrement())
-  name             String
-  email            String    @unique
-  mobile           String?
-  designation      String?
-  sex              String?
-  dob              DateTime?
-  placeOfBirth     String?
-  age              Int?
-  height           Float?
-  weight           Float?
-  bloodGroup       String?
-  nationality      String?
-  maritalStatus    String?
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  mobile        String?
+  designation   String?
+  sex           String?
+  dob           DateTime?
+  placeOfBirth  String?
+  age           Int?
+  height        Float?
+  weight        Float?
+  bloodGroup    String?
+  nationality   String?
+  maritalStatus String?
 
-  currentAddress   String?
-  currentPinCode   String?   
+  currentAddress String?
+  currentPinCode String?
 
   permanentAddress String?
-  permanentPinCode String?   
+  permanentPinCode String?
 
-  profileImageUrl  String?  
+  profileImageUrl String?
 
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Foreign Keys
-  departmentId     Int?
-  department       Department? @relation(fields: [departmentId], references: [id])
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
 
-  coordinatorId    Int?
-  coordinator      User? @relation("UserCoordinator", fields: [coordinatorId], references: [id])
+  coordinatorId Int?
+  coordinator   User? @relation("UserCoordinator", fields: [coordinatorId], references: [id])
 
-  qualifications   Qualification[]
-  employments      Employment[]
-  references       Reference[]
-  payroll          Payroll[]
+  qualifications Qualification[]
+  employments    Employment[]
+  references     Reference[]
+  payroll        Payroll[]
 
   // Legal/Personal Info
   liabilitiesDetails    String?
@@ -92,7 +92,6 @@ model Employee {
   replacementOf   String?
   isRehire        Boolean?  @default(false)
 }
-
 
 model Qualification {
   id         Int      @id @default(autoincrement())
@@ -156,5 +155,45 @@ model Payroll {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-   @@unique([employeeId, month, year])
+
+  @@unique([employeeId, month, year])
+}
+
+//    Holiday
+
+model Holiday {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  date        DateTime
+  isPaid      Boolean  @default(true)
+
+  // Relations
+  holidayTypeId Int
+  holidayType   HolidayType @relation(fields: [holidayTypeId], references: [id])
+
+  regionId Int?
+  region   Region? @relation(fields: [regionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//        settings
+
+model Region {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique // e.g., "Tamil Nadu", "Maharashtra", "USA - NY"
+  description String    @unique // e.g., "Tamil Nadu", "Maharashtra", "USA - NY"
+  holidays    Holiday[] // Relation to Holiday
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model HolidayType {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique // "National", "Regional", "Optional", "Company"
+  holidays  Holiday[] // Relation to Holiday
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

@@ -185,25 +185,45 @@ const navItems: NavItem[] = [
 const othersItems: NavItem[] = [
   {
     icon: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M12 2C11.5858 2 11.25 2.33579 11.25 2.75V12C11.25 12.4142 11.5858 12.75 12 12.75H21.25C21.6642 12.75 22 12.4142 22 12C22 6.47715 17.5228 2 12 2ZM12.75 11.25V3.53263C13.2645 3.57761 13.7659 3.66843 14.25 3.80098V3.80099C15.6929 4.19606 16.9827 4.96184 18.0104 5.98959C19.0382 7.01734 19.8039 8.30707 20.199 9.75C20.3316 10.2341 20.4224 10.7355 20.4674 11.25H12.75ZM2 12C2 7.25083 5.31065 3.27489 9.75 2.25415V3.80099C6.14748 4.78734 3.5 8.0845 3.5 12C3.5 16.6944 7.30558 20.5 12 20.5C15.9155 20.5 19.2127 17.8525 20.199 14.25H21.7459C20.7251 18.6894 16.7492 22 12 22C6.47715 22 2 17.5229 2 12Z"
-          fill="currentColor"
-        />
-      </svg>
+     <svg
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M8 2V5"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+  <path
+    d="M16 2V5"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+  />
+  <rect
+    x="3"
+    y="5"
+    width="18"
+    height="16"
+    rx="2"
+    stroke="currentColor"
+    stroke-width="1.5"
+  />
+  <path
+    d="M12 14L13.09 15.8L15.18 16.18L13.59 17.64L13.91 19.73L12 18.77L10.09 19.73L10.41 17.64L8.82 16.18L10.91 15.8L12 14Z"
+    fill="currentColor"
+  />
+</svg>
+
     ),
-    name: "Charts",
+    name: "Workforce",
     subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
+      { name: "Holiday", path: "/holiday", pro: false },
+      { name: "Leave", path: "/leave", pro: false },
     ],
   },
   {
@@ -223,39 +243,39 @@ const othersItems: NavItem[] = [
         />
       </svg>
     ),
-    name: "UI Elements",
+    name: "Settings",
     subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
+      { name: "Region", path: "/settings", pro: false },
+      // { name: "Avatar", path: "/avatars", pro: false },
+      // { name: "Badge", path: "/badge", pro: false },
+      // { name: "Buttons", path: "/buttons", pro: false },
+      // { name: "Images", path: "/images", pro: false },
+      // { name: "Videos", path: "/videos", pro: false },
     ],
   },
-  {
-    icon: (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M14 2.75C14 2.33579 14.3358 2 14.75 2C15.1642 2 15.5 2.33579 15.5 2.75V5.73291L17.75 5.73291H19C19.4142 5.73291 19.75 6.0687 19.75 6.48291C19.75 6.89712 19.4142 7.23291 19 7.23291H18.5L18.5 12.2329C18.5 15.5691 15.9866 18.3183 12.75 18.6901V21.25C12.75 21.6642 12.4142 22 12 22C11.5858 22 11.25 21.6642 11.25 21.25V18.6901C8.01342 18.3183 5.5 15.5691 5.5 12.2329L5.5 7.23291H5C4.58579 7.23291 4.25 6.89712 4.25 6.48291C4.25 6.0687 4.58579 5.73291 5 5.73291L6.25 5.73291L8.5 5.73291L8.5 2.75C8.5 2.33579 8.83579 2 9.25 2C9.66421 2 10 2.33579 10 2.75L10 5.73291L14 5.73291V2.75ZM7 7.23291L7 12.2329C7 14.9943 9.23858 17.2329 12 17.2329C14.7614 17.2329 17 14.9943 17 12.2329L17 7.23291L7 7.23291Z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
+  // {
+  //   icon: (
+  //     <svg
+  //       width="24"
+  //       height="24"
+  //       viewBox="0 0 24 24"
+  //       fill="none"
+  //       xmlns="http://www.w3.org/2000/svg"
+  //     >
+  //       <path
+  //         fill-rule="evenodd"
+  //         clip-rule="evenodd"
+  //         d="M14 2.75C14 2.33579 14.3358 2 14.75 2C15.1642 2 15.5 2.33579 15.5 2.75V5.73291L17.75 5.73291H19C19.4142 5.73291 19.75 6.0687 19.75 6.48291C19.75 6.89712 19.4142 7.23291 19 7.23291H18.5L18.5 12.2329C18.5 15.5691 15.9866 18.3183 12.75 18.6901V21.25C12.75 21.6642 12.4142 22 12 22C11.5858 22 11.25 21.6642 11.25 21.25V18.6901C8.01342 18.3183 5.5 15.5691 5.5 12.2329L5.5 7.23291H5C4.58579 7.23291 4.25 6.89712 4.25 6.48291C4.25 6.0687 4.58579 5.73291 5 5.73291L6.25 5.73291L8.5 5.73291L8.5 2.75C8.5 2.33579 8.83579 2 9.25 2C9.66421 2 10 2.33579 10 2.75L10 5.73291L14 5.73291V2.75ZM7 7.23291L7 12.2329C7 14.9943 9.23858 17.2329 12 17.2329C14.7614 17.2329 17 14.9943 17 12.2329L17 7.23291L7 7.23291Z"
+  //         fill="currentColor"
+  //       />
+  //     </svg>
+  //   ),
+  //   name: "Authentication",
+  //   subItems: [
+  //     { name: "Sign In", path: "/signin", pro: false },
+  //     { name: "Sign Up", path: "/signup", pro: false },
+  //   ],
+  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -585,7 +605,7 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {/* others */}
-              {/* {renderMenuItems(othersItems, "others")} */}
+              {renderMenuItems(othersItems, "others")}
             </div>
           </div>
         </nav>

@@ -10,6 +10,9 @@ import userRouter from "./routes/userRouter.js";
 import departmentRouter from "./routes/departmentRouter.js"
 import adminRouter from "./routes/adminRouter.js"
 import employeeRouter from "./routes/employeeRouter.js"
+import settingRouter from "./routes/settingRouter.js"
+import workforceRouter from "./routes/workforceRouter.js"
+
 
 import { errorHandler, notFound } from "./middlewares/errorMiddlware.js";
 
@@ -35,6 +38,10 @@ app.use("/api/users", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/employee/", employeeRouter);
 app.use("/api/department", departmentRouter);
+app.use("/api/department", departmentRouter);
+app.use("/api/setting", settingRouter);
+app.use("/api/workforce", workforceRouter);
+
 
 
 app.get("/", (req, res) => {
