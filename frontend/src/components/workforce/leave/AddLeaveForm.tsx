@@ -1,34 +1,31 @@
-import { useState, useEffect } from "react";
-import Input from "../input/InputField";
-import TextArea from "../input/TextArea";
-import Button from "../ui/button/Button";
-import Label from "../form/Label";
-import { useModal } from "../../hooks/useModal";
-import ComponentCard from "../common/ComponentCard";
-import { useWorkforceStore } from "../../store/workforceStore";
-import { useSettingStore } from "../../store/settingStore";
+import { useEffect, useState } from "react";
+import Input from "../../input/InputField";
+import TextArea from "../../input/TextArea";
+import Button from "../../ui/button/Button";
+import Label from "../../form/Label";
+import { useEmployeeStore } from "../../../store/employeeStore"; // Assuming you have this for dropdown
+import { useWorkforceStore } from "../../../store/workforceStore";
+import { useModal } from "../../../hooks/useModal";
+import ComponentCard from "../../common/ComponentCard";
 
-export default function AddHolidayForm() {
+export default function AddLeaveForm() {
   const { closeModal } = useModal();
-  const { addHoliday, error } = useWorkforceStore();
-  const { holidayTypes, fetchHolidayTypes, regions, fetchRegions } =
-    useSettingStore();
+  const { addLeave, error } = useWorkforceStore();
+  const { employees, fetchEmployees } = useEmployeeStore();
 
   const [form, setForm] = useState({
     title: "",
     description: "",
-    date: "",
+    leaveDate: "",
     isPaid: true,
-    holidayTypeId: 0,
-    regionId: undefined as number | undefined,
+    employeeId: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetchHolidayTypes();
-    fetchRegions();
-  }, [fetchHolidayTypes, fetchRegions]);
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -47,10 +44,9 @@ export default function AddHolidayForm() {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.title.trim()) newErrors.title = "Holiday title is required.";
-    if (!form.date.trim()) newErrors.date = "Holiday date is required.";
-    if (!form.holidayTypeId)
-      newErrors.holidayTypeId = "Holiday type is required.";
+    if (!form.title.trim()) newErrors.title = "Leave title is required.";
+    if (!form.leaveDate.trim()) newErrors.leaveDate = "Leave date is required.";
+    if (!form.employeeId) newErrors.employeeId = "Please select an employee.";
     return newErrors;
   };
 
@@ -61,34 +57,33 @@ export default function AddHolidayForm() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await addHoliday({
+      await addLeave({
         ...form,
-        holidayTypeId: Number(form.holidayTypeId),
-        regionId: form.regionId ? Number(form.regionId) : undefined,
-        date: new Date(form.date).toISOString(),
+        employeeId: Number(form.employeeId),
+        leaveDate: new Date(form.leaveDate).toISOString(),
       });
       closeModal();
     } catch (err) {
-      console.error("Error adding holiday:", err);
+      console.error("Error adding leave:", err);
     }
   };
 
   return (
-    <ComponentCard title="Add Holiday" desc="">
+    <ComponentCard title="Add Leave" desc="">
       <form className="flex flex-col" onSubmit={handleSubmit}>
         {error && (
-          <h5 className="mb-5 text-lg font-medium text-red-500 dark:text-white/90">
+          <h5 className="mb-4 text-sm font-medium text-red-500 dark:text-white/90">
             {error}
           </h5>
         )}
 
         <div className="grid grid-cols-1 gap-y-5">
           <div>
-            <Label>Title</Label>
+            <Label>Leave Title</Label>
             <Input
               type="text"
               name="title"
-              placeholder="Enter holiday title"
+              placeholder="Enter leave title"
               value={form.title}
               onChange={handleChange}
               error={!!errors.title}
@@ -97,54 +92,35 @@ export default function AddHolidayForm() {
           </div>
 
           <div>
-            <Label>Date</Label>
+            <Label>Leave Date</Label>
             <Input
               type="date"
-              name="date"
-              value={form.date}
+              name="leaveDate"
+              value={form.leaveDate}
               onChange={handleChange}
-              error={!!errors.date}
-              hint={errors.date}
+              error={!!errors.leaveDate}
+              hint={errors.leaveDate}
             />
           </div>
 
           <div>
-            <Label>Holiday Type</Label>
+            <Label>Employee</Label>
             <select
-              name="holidayTypeId"
-              value={form.holidayTypeId}
+              name="employeeId"
+              value={form.employeeId}
               onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             >
-              <option value={0}>Select Holiday Type</option>
-              {holidayTypes?.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
+              <option value={0}>Select Employee</option>
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.name}
                 </option>
               ))}
             </select>
-            {errors.holidayTypeId && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.holidayTypeId}
-              </p>
+            {errors.employeeId && (
+              <p className="mt-1 text-sm text-red-500">{errors.employeeId}</p>
             )}
-          </div>
-
-          <div>
-            <Label>Region (Optional)</Label>
-            <select
-              name="regionId"
-              value={form.regionId ?? ""}
-              onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            >
-              <option value="">Select Region</option>
-              {regions?.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div>
@@ -167,12 +143,12 @@ export default function AddHolidayForm() {
               onChange={handleChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label
+            <Label
               htmlFor="isPaid"
               className="text-sm text-gray-700 dark:text-white"
             >
-              Paid Holiday
-            </label>
+              Paid Leave
+            </Label>
           </div>
         </div>
 
@@ -180,7 +156,7 @@ export default function AddHolidayForm() {
           <Button size="sm" variant="outline" onClick={closeModal}>
             Cancel
           </Button>
-          <Button size="sm">Create Holiday</Button>
+          <Button size="sm">Create Leave</Button>
         </div>
       </form>
     </ComponentCard>

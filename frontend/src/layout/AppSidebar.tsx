@@ -222,8 +222,9 @@ const othersItems: NavItem[] = [
     ),
     name: "Workforce",
     subItems: [
-      { name: "Holiday", path: "/holiday", pro: false },
-      { name: "Leave", path: "/leave", pro: false },
+      { name: "Events", path: "/workforce/events", pro: false },
+      { name: "Holiday", path: "/workforce/holiday", pro: false },
+      { name: "Leave", path: "/workforce/leave", pro: false },
     ],
   },
   {

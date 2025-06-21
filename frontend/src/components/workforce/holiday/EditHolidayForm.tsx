@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import Input from "../input/InputField";
-import TextArea from "../input/TextArea";
-import Button from "../ui/button/Button";
-import { useModal } from "../../hooks/useModal";
-import { useWorkforceStore } from "../../store/workforceStore";
-import { useSettingStore } from "../../store/settingStore";
-import Label from "../form/Label";
-import ComponentCard from "../common/ComponentCard";
+import Input from "../../input/InputField";
+import TextArea from "../../input/TextArea";
+import Button from "../../ui/button/Button";
+import { useModal } from "../../../hooks/useModal";
+import { useWorkforceStore } from "../../../store/workforceStore";
+import { useSettingStore } from "../../../store/settingStore";
+import Label from "../../form/Label";
+import ComponentCard from "../../common/ComponentCard";
 
 interface EditHolidayFormProps {
   holidayId: number;
@@ -14,14 +14,11 @@ interface EditHolidayFormProps {
 
 export default function EditHolidayForm({ holidayId }: EditHolidayFormProps) {
   const { closeModal } = useModal();
-  const {
-    getHolidayById,
-    updateHoliday,
-    selectedHoliday,
-    error,
-  } = useWorkforceStore();
+  const { getHolidayById, updateHoliday, selectedHoliday, error } =
+    useWorkforceStore();
 
-  const { fetchRegions, regions, holidayTypes, fetchHolidayTypes } = useSettingStore();
+  const { fetchRegions, regions, holidayTypes, fetchHolidayTypes } =
+    useSettingStore();
 
   const [form, setForm] = useState({
     title: "",
@@ -62,7 +59,9 @@ export default function EditHolidayForm({ holidayId }: EditHolidayFormProps) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const target = e.target as HTMLInputElement;
     const { name, type } = target;
@@ -95,7 +94,7 @@ export default function EditHolidayForm({ holidayId }: EditHolidayFormProps) {
           </h5>
         )}
 
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-y-5">
           <div>
             <Label>Title</Label>
             <Input
@@ -110,19 +109,6 @@ export default function EditHolidayForm({ holidayId }: EditHolidayFormProps) {
           </div>
 
           <div>
-            <Label>Description</Label>
-            <TextArea
-              placeholder="Optional description"
-              value={form.description}
-              onChange={(val) =>
-                setForm((prev) => ({ ...prev, description: val }))
-              }
-              error={false}
-              hint=""
-            />
-          </div>
-
-          <div>
             <Label>Date</Label>
             <Input
               type="date"
@@ -131,17 +117,6 @@ export default function EditHolidayForm({ holidayId }: EditHolidayFormProps) {
               onChange={handleChange}
               error={!!errors.date}
               hint={errors.date || ""}
-            />
-          </div>
-
-          <div>
-            <Label>Is Paid</Label>
-            <input
-              type="checkbox"
-              name="isPaid"
-              checked={form.isPaid}
-              onChange={handleChange}
-              className="ml-2"
             />
           </div>
 
@@ -180,10 +155,37 @@ export default function EditHolidayForm({ holidayId }: EditHolidayFormProps) {
           </div>
         </div>
 
+        <div>
+          <Label>Description</Label>
+          <TextArea
+            placeholder="Optional description"
+            value={form.description}
+            onChange={(val) =>
+              setForm((prev) => ({ ...prev, description: val }))
+            }
+            error={false}
+            hint=""
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="isPaid"
+            checked={form.isPaid}
+            onChange={handleChange}
+            // className="ml-2"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <Label className="text-sm text-gray-700 dark:text-white">
+            Paid Holiday
+          </Label>
+        </div>
+
         <div className="flex items-center gap-3 mt-6 justify-end">
-          <Button size="sm" variant="outline" onClick={closeModal}>
+          {/* <Button size="sm" variant="outline" onClick={closeModal}>
             Cancel
-          </Button>
+          </Button> */}
           <Button size="sm">Update Holiday</Button>
         </div>
       </form>

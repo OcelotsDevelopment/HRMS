@@ -10,7 +10,8 @@ import ListEmployee from "./pages/employee/ListEmployee";
 import EmployeeProfiles from "./pages/employee/EmployeeDetails/EmployeeProfile";
 import Calendar from "./pages/Calendar";
 import Setting from "./pages/setting/Setting";
-import ListHoliday from "./pages/holiday/ListHoliday";
+import ListHoliday from "./pages/workforce/holiday/ListHoliday";
+import ListLeave from "./pages/workforce/leave/ListLeave";
 // import AddEmployeeForm from "./components/employee/form/AddEmployeeForm";
 
 function App() {
@@ -31,18 +32,14 @@ function App() {
             />
 
             {/* workforce */}
+            <Route path="/workforce/holiday" element={<ListHoliday />} />
 
-            
-            <Route path="/holiday" element={<ListHoliday />} />
+            <Route path="/workforce/leave" element={<ListLeave />} />
 
+            <Route path="/workforce/events" element={<Calendar />} />
 
             {/* SETTINGS */}
             <Route path="/settings" element={<Setting />} />
-
-            {/* Calendar */}
-            <Route path="/Calendar" element={<Calendar />} />
-
-            {/* Add more routes as needed */}
           </Route>
 
           <Route path="/signin" element={<SignInForm />} />

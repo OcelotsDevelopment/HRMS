@@ -1,14 +1,14 @@
 // pages/holiday/ListHoliday.tsx
 import { useEffect, useState } from "react";
-import PageMeta from "../../components/common/PageMeta";
-import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import ComponentCard from "../../components/common/ComponentCard";
-import { Modal } from "../../components/ui/modal";
+import PageMeta from "../../../components/common/PageMeta";
+import PageBreadcrumb from "../../../components/common/PageBreadCrumb";
+import ComponentCard from "../../../components/common/ComponentCard";
+import { Modal } from "../../../components/ui/modal";
 
-import HolidayTable from "../../components/holiday/HolidayTable";
-import AddHolidayForm from "../../components/holiday/AddHolidayForm";
-import EditHolidayForm from "../../components/holiday/EditHolidayForm";
-import { useWorkforceStore } from "../../store/workforceStore";
+import HolidayTable from "../../../components/workforce/holiday/HolidayTable";
+import AddHolidayForm from "../../../components/workforce/holiday/AddHolidayForm";
+import EditHolidayForm from "../../../components/workforce/holiday/EditHolidayForm";
+import { useWorkforceStore } from "../../../store/workforceStore";
 
 export default function ListHoliday() {
   const [open, setOpen] = useState(false);

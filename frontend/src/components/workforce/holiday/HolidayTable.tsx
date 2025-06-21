@@ -1,7 +1,7 @@
 // components/holiday/HolidayTable.tsx
 import { useEffect, useState } from "react";
-import { useWorkforceStore } from "../../store/workforceStore";
-import DataTable from "../common/DataTable";
+import { useWorkforceStore } from "../../../store/workforceStore";
+import DataTable from "../../common/DataTable";
 import { type JSX } from "react";
 
 type HolidayRow = {
