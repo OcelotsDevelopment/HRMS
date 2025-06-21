@@ -12,7 +12,7 @@ type User = {
 
 type AuthState = {
   token: string | null;
-  user: User | null;
+  userLoged: User | null;
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       token: null,
-      user: null,
+      userLoged: null,
       loading: false,
       error: null,
 
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState>()(
           const { token, user } = res.data; // your backend response
           localStorage.setItem("auth_token", token);
           localStorage.setItem("user", JSON.stringify(user));
-          set({ token, user, loading: false });
+          set({ token, userLoged:user, loading: false });
           // Save token in axios headers
           // api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         } catch (err: unknown) {
@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        set({ token: null, user: null, error: null });
+        set({ token: null, userLoged: null, error: null });
         delete api.defaults.headers.common["Authorization"];
         localStorage.removeItem("auth_token");
         localStorage.removeItem("user");
@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth",
-      partialize: (state) => ({ token: state.token, user: state.user }), // only persist these
+      partialize: (state) => ({ token: state.token, user: state.userLoged }), // only persist these
     }
   )
 );

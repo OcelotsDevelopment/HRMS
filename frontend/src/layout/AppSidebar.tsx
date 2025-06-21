@@ -86,33 +86,32 @@ const navItems: NavItem[] = [
   },
   {
     icon: (
-    <svg
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M12 2C6.48 2 2 6.48 2 12C2 14.63 3.05 17.01 4.76 18.76C5.18 16.5 7.16 14.8 9.5 14.8H14.5C16.84 14.8 18.82 16.5 19.24 18.76C20.95 17.01 22 14.63 22 12C22 6.48 17.52 2 12 2Z"
-    stroke="currentColor"
-    stroke-width="1.5"
-    fill="none"
-  />
-  <path
-    d="M9 10.5C9 9.11929 10.1193 8 11.5 8H12.5C13.8807 8 15 9.11929 15 10.5C15 11.8807 13.8807 13 12.5 13H11.5C10.1193 13 9 11.8807 9 10.5Z"
-    stroke="currentColor"
-    stroke-width="1.5"
-    fill="none"
-  />
-  <path
-    d="M9.75 17.5H14.25C14.8023 17.5 15.25 17.9477 15.25 18.5V19.25C15.25 19.6642 14.9142 20 14.5 20H9.5C9.08579 20 8.75 19.6642 8.75 19.25V18.5C8.75 17.9477 9.19772 17.5 9.75 17.5Z"
-    stroke="currentColor"
-    stroke-width="1.5"
-    fill="none"
-  />
-</svg>
-
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12C2 14.63 3.05 17.01 4.76 18.76C5.18 16.5 7.16 14.8 9.5 14.8H14.5C16.84 14.8 18.82 16.5 19.24 18.76C20.95 17.01 22 14.63 22 12C22 6.48 17.52 2 12 2Z"
+          stroke="currentColor"
+          stroke-width="1.5"
+          fill="none"
+        />
+        <path
+          d="M9 10.5C9 9.11929 10.1193 8 11.5 8H12.5C13.8807 8 15 9.11929 15 10.5C15 11.8807 13.8807 13 12.5 13H11.5C10.1193 13 9 11.8807 9 10.5Z"
+          stroke="currentColor"
+          stroke-width="1.5"
+          fill="none"
+        />
+        <path
+          d="M9.75 17.5H14.25C14.8023 17.5 15.25 17.9477 15.25 18.5V19.25C15.25 19.6642 14.9142 20 14.5 20H9.5C9.08579 20 8.75 19.6642 8.75 19.25V18.5C8.75 17.9477 9.19772 17.5 9.75 17.5Z"
+          stroke="currentColor"
+          stroke-width="1.5"
+          fill="none"
+        />
+      </svg>
     ),
     name: "Employee Management",
     path: "/employee-management",
@@ -185,40 +184,39 @@ const navItems: NavItem[] = [
 const othersItems: NavItem[] = [
   {
     icon: (
-     <svg
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M8 2V5"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-  <path
-    d="M16 2V5"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-  <rect
-    x="3"
-    y="5"
-    width="18"
-    height="16"
-    rx="2"
-    stroke="currentColor"
-    stroke-width="1.5"
-  />
-  <path
-    d="M12 14L13.09 15.8L15.18 16.18L13.59 17.64L13.91 19.73L12 18.77L10.09 19.73L10.41 17.64L8.82 16.18L10.91 15.8L12 14Z"
-    fill="currentColor"
-  />
-</svg>
-
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M8 2V5"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M16 2V5"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+        <rect
+          x="3"
+          y="5"
+          width="18"
+          height="16"
+          rx="2"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M12 14L13.09 15.8L15.18 16.18L13.59 17.64L13.91 19.73L12 18.77L10.09 19.73L10.41 17.64L8.82 16.18L10.91 15.8L12 14Z"
+          fill="currentColor"
+        />
+      </svg>
     ),
     name: "Workforce",
     subItems: [
@@ -399,7 +397,7 @@ const AppSidebar: React.FC = () => {
                   className={`ml-auto w-5 h-5 transition-transform duration-200 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
+                      ? "rotate-180 text-brand-500" 
                       : ""
                   }`}
                 >
@@ -521,10 +519,10 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.jpeg"
+                src="/images/logo/logo.png"
                 alt="Logo"
-                width={50}
-                height={40}
+                width={60}
+                height={50}
               />
               <img
                 className="hidden dark:block"
@@ -536,10 +534,10 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="/images/logo/logo.jpeg"
+              src="/images/logo/logo.png"
               alt="Logo"
-              width={32}
-              height={32}
+              width={42}
+              height={52}
             />
           )}
         </Link>
