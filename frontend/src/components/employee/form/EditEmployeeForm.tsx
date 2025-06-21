@@ -293,7 +293,7 @@ export default function EditEmployeeForm({ employee }: Props) {
           </div>
 
           <div>
-            <Label>User</Label>
+            <Label>Coordinator</Label>
             <Select
               options={userDepartmentOptions}
               placeholder="Select User"

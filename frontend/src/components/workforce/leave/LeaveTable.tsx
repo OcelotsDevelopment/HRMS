@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { type JSX } from "react";
 import DataTable from "../../common/DataTable";
 import { useWorkforceStore } from "../../../store/workforceStore";
+import Badge from "../../ui/badge/Badge";
 
 type LeaveRow = {
   id: number;
   title: string;
   date: string;
-  status: string;
+  status: JSX.Element;
   employeeName?: string;
   appliedByName?: string;
   action?: JSX.Element;
@@ -23,14 +24,28 @@ export default function LeaveTable({ openModal }: LeaveTableProps) {
 
   useEffect(() => {
     if (leaves) {
+      console.log(leaves, "leelelelelleleelleelelelelleel");
 
-      console.log(leaves,"leelelelelleleelleelelelelleel");
-      
       const formatted: LeaveRow[] = leaves?.map((item) => ({
         id: item.id,
         title: item.title,
         date: new Date(item.leaveDate).toLocaleDateString(),
-        status: item.status,
+        status: (
+          <Badge
+            size="sm"
+            color={
+              item.status.toUpperCase() === "APPROVED"
+                ? "success"
+                : item.status.toUpperCase() === "PENDING"
+                ? "warning"
+                : item.status.toUpperCase() === "REJECTED"
+                ? "error"
+                : "error"
+            }
+          >
+            {item.status}
+          </Badge>
+        ),
         employeeName: item.employee?.name ?? "—",
         appliedByName: item?.title || item?.title || "—",
         action: (

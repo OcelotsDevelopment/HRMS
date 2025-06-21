@@ -274,7 +274,7 @@ export default function AddEmployeeForm() {
           </div>
 
           <div>
-            <Label>User</Label>
+            <Label>Coordinator</Label>
             {/* <Select
               options={userDepartmentOptions}
               placeholder="Select User"
