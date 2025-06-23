@@ -262,6 +262,9 @@ model AttendanceLog {
   createdAt  DateTime @default(now())
 
   employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([employeeId, timestamp])
+
 }
 
 model DailyAttendance {
@@ -278,5 +281,5 @@ model DailyAttendance {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([employeeId, date], name: "employee_date_unique") 
+  @@unique([employeeId, date], name: "employee_date_unique")
 }

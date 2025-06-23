@@ -9,6 +9,21 @@ function isValidDate(input) {
   );
 }
 
+const generateUniqueEmployeeId = async () => {
+  let uniqueId;
+  let exists = true;
+
+  while (exists) {
+    uniqueId = Math.floor(100 + Math.random() * 900); // Random 3-digit number
+    const employee = await prisma.employee.findUnique({
+      where: { employeeUniqueId: String(uniqueId) },
+    });
+    if (!employee) exists = false;
+  }
+
+  return String(uniqueId);
+};
+
 export const createEmployeeService = async (data) => {
   try {
     let {
@@ -78,8 +93,12 @@ export const createEmployeeService = async (data) => {
       ? await prisma.user.findUnique({ where: { id: coordinatorId } })
       : null;
 
+    // Generate unique employeeUniqueId
+    const employeeUniqueId = await generateUniqueEmployeeId();
+
     const employee = await prisma.employee.create({
       data: {
+        employeeUniqueId,
         name,
         email,
         mobile,
@@ -176,7 +195,6 @@ export const getEmployeeByIdService = async (id) => {
 
 export const updateEmployeeService = async (id, data) => {
   try {
-
     // Validate and convert DOB
     if (data.dob && !isValidDate(data.dob))
       throw new Error("Invalid date of birth");
@@ -418,9 +436,8 @@ export const createPayrollService = async (data) => {
 
     return { payroll };
   } catch (error) {
+    console.log(error, "asdlfkjalskdflakdfhjldkj");
 
-    console.log(error,"asdlfkjalskdflakdfhjldkj");
-    
     if (error.code === "P2002") {
       throw new Error("Payroll already exists for this month and employee.");
     }
@@ -444,8 +461,6 @@ export const getPayrollByIdService = async (id) => {
 
 // List Payrolls by Employee
 export const getPayrollsByEmployeeService = async (employeeId) => {
-
-  
   const payrolls = await prisma.payroll.findMany({
     where: { employeeId },
     orderBy: { createdAt: "desc" }, // Or paymentDate

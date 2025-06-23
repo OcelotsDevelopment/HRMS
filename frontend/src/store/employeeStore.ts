@@ -74,6 +74,7 @@ type Payroll = {
 };
 type Employee = {
   id: number;
+  employeeUniqueId:string;
   name: string;
   email: string;
   mobile?: string;

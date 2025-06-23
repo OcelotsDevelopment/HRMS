@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 interface EmployeeRow {
   id: number;
+  employeeId:string;
   name: string;
   email: string;
   position?: string;
@@ -35,6 +36,7 @@ export default function EmployeeTable({ openModal }: EmployeeTableProps) {
   useEffect(() => {
     const formatted = employees.map((employee) => ({
       id: employee.id,
+      employeeId:employee.employeeUniqueId,
       name: employee.name,
       email: employee.email,
       position: employee.designation ?? "—",
@@ -107,6 +109,12 @@ export default function EmployeeTable({ openModal }: EmployeeTableProps) {
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
+               <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                Employee ID
+              </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -142,6 +150,11 @@ export default function EmployeeTable({ openModal }: EmployeeTableProps) {
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {tableData.map((employee) => (
               <TableRow key={employee.id}>
+
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                 OCLT - {employee.employeeId}
+                </TableCell>
+                
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {employee.name}
                 </TableCell>

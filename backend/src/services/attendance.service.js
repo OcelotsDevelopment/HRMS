@@ -122,6 +122,18 @@ export const manualAttendanceEntryService = async (data) => {
 
     if (!employee) throw new Error("Employee not found");
 
+    // const findAttendance = await prisma.attendanceLog.findUnique({
+    //   where: {
+    //     employeeId_timestamp: {
+    //       employeeId,
+    //       timestamp: new Date(checkIn),
+    //     },
+    //   },
+    // });
+
+    // if (findAttendance)
+    //   throw new Error("This Employee Attendance Already Exists");
+
     const punchLogs = [];
 
     // Create punch IN log
@@ -156,6 +168,8 @@ export const manualAttendanceEntryService = async (data) => {
     const workDate = getDayStart(checkIn || checkOut);
     const total = checkIn && checkOut ? calculateHours(checkIn, checkOut) : 0;
 
+    console.log(workDate, "workDateworkDateworkDate");
+
     const summary = await prisma.dailyAttendance.upsert({
       where: {
         employee_date_unique: {
@@ -174,9 +188,12 @@ export const manualAttendanceEntryService = async (data) => {
         status: total >= 9 ? "PRESENT" : total >= 4 ? "HALF_DAY" : "ABSENT",
       },
       update: {
-        checkIn: checkIn ? new Date(checkIn) : undefined,
-        checkOut: checkOut ? new Date(checkOut) : undefined,
+        checkIn: checkIn ? new Date(checkIn) : null,
+        checkOut: checkOut ? new Date(checkOut) : null,
         source: "MANUAL",
+        totalHours: total,
+        otHours: total > 9 ? total - 9 : 0,
+        status: total >= 9 ? "PRESENT" : total >= 4 ? "HALF_DAY" : "ABSENT",
       },
     });
 
@@ -189,7 +206,6 @@ export const manualAttendanceEntryService = async (data) => {
 
 // Get all attendance logs (optionally filterable)
 export const getAllAttendanceLogsService = async () => {
-
   const logs = await prisma.attendanceLog.findMany({
     include: {
       employee: {
@@ -210,11 +226,9 @@ export const getAllAttendanceLogsService = async () => {
   return { logs };
 };
 
-
 // services/attendance.service.js
 
 export const getAllDailyAttendanceService = async () => {
-
   const dailyAttendance = await prisma.dailyAttendance.findMany({
     include: {
       employee: {
@@ -237,10 +251,8 @@ export const getAllDailyAttendanceService = async () => {
   return { dailyAttendance };
 };
 
-
 // Get punch logs for an employee
 export const getAttendanceLogsByEmployeeIdService = async (employeeId) => {
-
   const logs = await prisma.attendanceLog.findMany({
     where: { employeeId },
     orderBy: { timestamp: "asc" },
@@ -251,7 +263,6 @@ export const getAttendanceLogsByEmployeeIdService = async (employeeId) => {
 
 // Get daily summaries for an employee
 export const getDailyAttendanceByEmployeeIdService = async (employeeId) => {
-  
   const summaries = await prisma.dailyAttendance.findMany({
     where: { employeeId },
     orderBy: { date: "desc" },
@@ -259,7 +270,6 @@ export const getDailyAttendanceByEmployeeIdService = async (employeeId) => {
 
   return { summaries };
 };
-
 
 // GET /attendance/daily/id/:id
 export const getDailyAttendanceByIdService = async (req, res) => {

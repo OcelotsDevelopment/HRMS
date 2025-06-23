@@ -116,6 +116,55 @@ const navItems: NavItem[] = [
     name: "Employee Management",
     path: "/employee-management",
   },
+
+  {
+    icon: (
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          x="3"
+          y="4"
+          width="18"
+          height="17"
+          rx="2"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M8 2V6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M16 2V6"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M3 9H21"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M9 14L11 16L15 12"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    ),
+    name: "Attendance Management",
+    path: "/attendance",
+  },
   // {
   //   name: "Forms",
   //   icon: (
@@ -397,7 +446,7 @@ const AppSidebar: React.FC = () => {
                   className={`ml-auto w-5 h-5 transition-transform duration-200 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500" 
+                      ? "rotate-180 text-brand-500"
                       : ""
                   }`}
                 >
