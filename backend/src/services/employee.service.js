@@ -98,7 +98,7 @@ export const createEmployeeService = async (data) => {
         permanentAddress,
 
         departmentId: department ? department.id : null,
-        coordinatorId: coordinator ? coordinator.id : null, // ✅ new line
+        coordinatorId: coordinator ? coordinator.id : null, // new line
 
         employeeCode,
         dateOfJoining:
@@ -142,13 +142,13 @@ export const getAllEmployeesService = async () => {
   const employees = await prisma.employee.findMany({
     include: {
       department: true,
-      coordinator: true, // ✅ include coordinator (User)
+      coordinator: true, // include coordinator (User)
       qualifications: true,
       employments: true,
       references: true,
     },
     orderBy: {
-      createdAt: "desc", // ✅ descending = newest first
+      createdAt: "desc", // descending = newest first
     },
   });
 
@@ -177,7 +177,7 @@ export const getEmployeeByIdService = async (id) => {
 export const updateEmployeeService = async (id, data) => {
   try {
 
-    // ✅ Validate and convert DOB
+    // Validate and convert DOB
     if (data.dob && !isValidDate(data.dob))
       throw new Error("Invalid date of birth");
     if (data.dob) data.dob = new Date(data.dob);
@@ -186,7 +186,7 @@ export const updateEmployeeService = async (id, data) => {
       throw new Error("Invalid date of joining");
     if (data.dateOfJoining) data.dateOfJoining = new Date(data.dateOfJoining);
 
-    // ✅ Validate coordinatorId
+    // Validate coordinatorId
     if (data.coordinatorId) {
       const coordinatorExists = await prisma.user.findUnique({
         where: { id: data.coordinatorId },
@@ -196,7 +196,7 @@ export const updateEmployeeService = async (id, data) => {
       }
     }
 
-    // ✅ Validate departmentId
+    // Validate departmentId
     if (data.departmentId) {
       const departmentExists = await prisma.department.findUnique({
         where: { id: data.departmentId },
@@ -206,7 +206,7 @@ export const updateEmployeeService = async (id, data) => {
       }
     }
 
-    // ✅ Update the employee
+    // Update the employee
     const employee = await prisma.employee.update({
       where: { id },
       data,

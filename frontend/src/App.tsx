@@ -12,6 +12,7 @@ import Calendar from "./pages/Calendar";
 import Setting from "./pages/setting/Setting";
 import ListHoliday from "./pages/workforce/holiday/ListHoliday";
 import ListLeave from "./pages/workforce/leave/ListLeave";
+import Attendance from "./pages/attendance/Attendance";
 // import AddEmployeeForm from "./components/employee/form/AddEmployeeForm";
 
 function App() {
@@ -37,6 +38,9 @@ function App() {
             <Route path="/workforce/leave" element={<ListLeave />} />
 
             <Route path="/workforce/events" element={<Calendar />} />
+
+            {/* Attendance */}
+            <Route path="/attendance" element={<Attendance />} />
 
             {/* SETTINGS */}
             <Route path="/settings" element={<Setting />} />

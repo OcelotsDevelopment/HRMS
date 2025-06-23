@@ -1,0 +1,74 @@
+import asyncHandler from "express-async-handler";
+import {
+  pushBiometricAttendanceService,
+  manualAttendanceEntryService,
+  getAttendanceLogsByEmployeeIdService,
+  getDailyAttendanceByEmployeeIdService,
+  getAllAttendanceLogsService,
+  getAllDailyAttendanceService,
+  getDailyAttendanceByIdService
+} from "../services/attendance.service.js";
+
+// @desc    Push biometric attendance (IN/OUT)
+/// @route   POST /api/attendance/biometric
+export const pushBiometricAttendance = asyncHandler(async (req, res) => {
+  const result = await pushBiometricAttendanceService(req.body);
+  res.status(201).json(result);
+});
+
+// @desc    Manually enter attendance for employee
+// @route   POST /api/attendance/manual
+export const manualAttendanceEntry = asyncHandler(async (req, res) => {
+  const result = await manualAttendanceEntryService(req.body);
+  res.status(201).json(result);
+});
+
+// @desc    Get all biometric/manual logs for an employee
+// @route   GET /api/attendance/logs/:employeeId
+export const getAttendanceLogsByEmployeeId = asyncHandler(async (req, res) => {
+  const result = await getAttendanceLogsByEmployeeIdService(
+    Number(req.params.employeeId)
+  );
+  res.status(200).json(result);
+});
+
+// @desc    Get daily summaries for an employee
+// @route   GET /api/attendance/daily/:employeeId
+export const getDailyAttendanceByEmployeeId = asyncHandler(async (req, res) => {
+  const result = await getDailyAttendanceByEmployeeIdService(
+    Number(req.params.id)
+  );
+  res.status(200).json(result);
+});
+
+
+// @desc    Get all employees' attendance logs
+// @route   GET /api/attendance/logs
+export const getAllAttendanceLogs = asyncHandler(async (req, res) => {
+  const result = await getAllAttendanceLogsService();
+  res.status(200).json(result);
+});
+
+
+// controllers/attendanceController.js
+export const getAllDailyAttendanceController = async (req, res) => {
+  try {
+    const result = await getAllDailyAttendanceService();
+    res.status(200).json({ success: true, data: result.dailyAttendance });
+  } catch (error) {
+    console.error("Error fetching daily attendance:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch daily attendance" });
+  }
+};
+
+
+// @desc    Get a single daily attendance entry by ID
+// @route   GET /api/attendance/daily/id/:id
+// @access  Private
+export const getDailyAttendanceById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await getDailyAttendanceByIdService(id);
+
+  res.status(200).json(result);
+});

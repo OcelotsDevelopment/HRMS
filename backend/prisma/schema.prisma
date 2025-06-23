@@ -38,20 +38,21 @@ model Department {
 }
 
 model Employee {
-  id            Int       @id @default(autoincrement())
-  name          String
-  email         String    @unique
-  mobile        String?
-  designation   String?
-  sex           String?
-  dob           DateTime?
-  placeOfBirth  String?
-  age           Int?
-  height        Float?
-  weight        Float?
-  bloodGroup    String?
-  nationality   String?
-  maritalStatus String?
+  id               Int       @id @default(autoincrement())
+  employeeUniqueId String? @unique
+  name             String
+  email            String    @unique
+  mobile           String?
+  designation      String?
+  sex              String?
+  dob              DateTime?
+  placeOfBirth     String?
+  age              Int?
+  height           Float?
+  weight           Float?
+  bloodGroup       String?
+  nationality      String?
+  maritalStatus    String?
 
   currentAddress String?
   currentPinCode String?
@@ -88,14 +89,16 @@ model Employee {
   impairmentDetails     String?
 
   // Admin fields
-  employeeCode    String?   @unique
+  employeeCode    String?           @unique
   dateOfJoining   DateTime?
   position        String?
   salaryOnJoining Float?
   reportingTo     String?
   hiredBy         String?
   replacementOf   String?
-  isRehire        Boolean?  @default(false)
+  isRehire        Boolean?          @default(false)
+  AttendanceLog   AttendanceLog[]
+  DailyAttendance DailyAttendance[]
 }
 
 model Qualification {
@@ -246,4 +249,34 @@ model Event {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Attendance
+model AttendanceLog {
+  id         String   @id @default(uuid())
+  employeeId Int
+  timestamp  DateTime
+  punchType  String // "IN" or "OUT"
+  source     String // "BIOMETRIC" | "MANUAL"
+  deviceId   String?
+  createdAt  DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+}
+
+model DailyAttendance {
+  id          String   @id @default(cuid())
+  employeeId  Int
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  date        DateTime
+  checkIn     DateTime?
+  checkOut    DateTime?
+  totalHours  Float?
+  otHours     Float?
+  status      String
+  source      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([employeeId, date], name: "employee_date_unique") 
 }
