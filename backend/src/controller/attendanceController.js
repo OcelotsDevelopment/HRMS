@@ -26,9 +26,7 @@ export const manualAttendanceEntry = asyncHandler(async (req, res) => {
 // @desc    Get all biometric/manual logs for an employee
 // @route   GET /api/attendance/logs/:employeeId
 export const getAttendanceLogsByEmployeeId = asyncHandler(async (req, res) => {
-  const result = await getAttendanceLogsByEmployeeIdService(
-    Number(req.params.employeeId)
-  );
+  const result = await getAttendanceLogsByEmployeeIdService(req.params.employeeId);
   res.status(200).json(result);
 });
 

@@ -122,22 +122,39 @@ export const manualAttendanceEntryService = async (data) => {
 
     if (!employee) throw new Error("Employee not found");
 
-    // const findAttendance = await prisma.attendanceLog.findUnique({
-    //   where: {
-    //     employeeId_timestamp: {
-    //       employeeId,
-    //       timestamp: new Date(checkIn),
-    //     },
-    //   },
-    // });
+    const getDayStart = (datetime) => {
+      const date = new Date(datetime);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
 
-    // if (findAttendance)
-    //   throw new Error("This Employee Attendance Already Exists");
+    const workDate = getDayStart(checkIn || checkOut);
+    const dayStart = new Date(workDate);
+    const dayEnd = new Date(workDate);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    // Check if both IN and OUT already exist for the day
+    const existingLogs = await prisma.attendanceLog.findMany({
+      where: {
+        employeeId,
+        timestamp: {
+          gte: dayStart,
+          lte: dayEnd,
+        },
+      },
+    });
+
+    const hasCheckIn = existingLogs.some((log) => log.punchType === "IN");
+    const hasCheckOut = existingLogs.some((log) => log.punchType === "OUT");
+
+    if (hasCheckIn && hasCheckOut) {
+      throw new Error("This employee already has check-in and check-out entries for the day");
+    }
 
     const punchLogs = [];
 
-    // Create punch IN log
-    if (checkIn) {
+    // Create punch IN log if not exists
+    if (checkIn && !hasCheckIn) {
       punchLogs.push(
         await prisma.attendanceLog.create({
           data: {
@@ -150,8 +167,8 @@ export const manualAttendanceEntryService = async (data) => {
       );
     }
 
-    // Create punch OUT log
-    if (checkOut) {
+    // Create punch OUT log if not exists
+    if (checkOut && !hasCheckOut) {
       punchLogs.push(
         await prisma.attendanceLog.create({
           data: {
@@ -164,11 +181,9 @@ export const manualAttendanceEntryService = async (data) => {
       );
     }
 
-    // Compute daily summary
-    const workDate = getDayStart(checkIn || checkOut);
-    const total = checkIn && checkOut ? calculateHours(checkIn, checkOut) : 0;
-
-    console.log(workDate, "workDateworkDateworkDate");
+    // Calculate total hours
+    const total =
+      checkIn && checkOut ? calculateHours(checkIn, checkOut) : 0;
 
     const summary = await prisma.dailyAttendance.upsert({
       where: {
@@ -199,10 +214,11 @@ export const manualAttendanceEntryService = async (data) => {
 
     return { summary, logs: punchLogs };
   } catch (error) {
-    console.log(error, "this is the error");
-    throw new Error(error);
+    console.error(error, " Error in manualAttendanceEntryService");
+    throw new Error(error.message || "Manual attendance entry failed");
   }
 };
+
 
 // Get all attendance logs (optionally filterable)
 export const getAllAttendanceLogsService = async () => {
@@ -252,13 +268,12 @@ export const getAllDailyAttendanceService = async () => {
 };
 
 // Get punch logs for an employee
-export const getAttendanceLogsByEmployeeIdService = async (employeeId) => {
-  const logs = await prisma.attendanceLog.findMany({
-    where: { employeeId },
-    orderBy: { timestamp: "asc" },
+export const getAttendanceLogsByEmployeeIdService = async (employeeId) => {  
+  const logs = await prisma.attendanceLog.findUnique({
+    where: { id:employeeId },
   });
 
-  return { logs };
+  return logs ;
 };
 
 // Get daily summaries for an employee
