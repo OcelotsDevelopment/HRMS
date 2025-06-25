@@ -148,7 +148,9 @@ export const manualAttendanceEntryService = async (data) => {
     const hasCheckOut = existingLogs.some((log) => log.punchType === "OUT");
 
     if (hasCheckIn && hasCheckOut) {
-      throw new Error("This employee already has check-in and check-out entries for the day");
+      throw new Error(
+        "This employee already has check-in and check-out entries for the day"
+      );
     }
 
     const punchLogs = [];
@@ -182,8 +184,7 @@ export const manualAttendanceEntryService = async (data) => {
     }
 
     // Calculate total hours
-    const total =
-      checkIn && checkOut ? calculateHours(checkIn, checkOut) : 0;
+    const total = checkIn && checkOut ? calculateHours(checkIn, checkOut) : 0;
 
     const summary = await prisma.dailyAttendance.upsert({
       where: {
@@ -219,6 +220,123 @@ export const manualAttendanceEntryService = async (data) => {
   }
 };
 
+export const updateManualAttendanceEntryService = async (id, data) => {
+  try {
+    const { employeeId, checkIn, checkOut } = data;
+
+    console.log(data, "📤 Updating Manual Attendance Data");
+
+    // 1. Validate employee
+    const employee = await prisma.employee.findUnique({
+      where: { id: employeeId },
+    });
+    if (!employee) throw new Error("Employee not found");
+
+    // 2. Define work day range
+    const getDayStart = (datetime) => {
+      const date = new Date(datetime);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const workDate = getDayStart(checkIn || checkOut);
+    const dayStart = new Date(workDate);
+    const dayEnd = new Date(workDate);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const punchLogs = [];
+
+    // 3. Update existing check-in log if exists
+    const checkInLog = await prisma.attendanceLog.findFirst({
+      where: {
+        employeeId,
+        punchType: "IN",
+        timestamp: {
+          gte: dayStart,
+          lte: dayEnd,
+        },
+        source: "MANUAL",
+      },
+    });
+
+    if (checkInLog && checkIn) {
+      const updated = await prisma.attendanceLog.update({
+        where: { id: checkInLog.id },
+        data: {
+          timestamp: new Date(checkIn),
+        },
+      });
+      punchLogs.push(updated);
+    }
+
+    // 4. Update existing check-out log if exists
+    const checkOutLog = await prisma.attendanceLog.findFirst({
+      where: {
+        employeeId,
+        punchType: "OUT",
+        timestamp: {
+          gte: dayStart,
+          lte: dayEnd,
+        },
+        source: "MANUAL",
+      },
+    });
+
+    if (checkOutLog && checkOut) {
+      const updated = await prisma.attendanceLog.update({
+        where: { id: checkOutLog.id },
+        data: {
+          timestamp: new Date(checkOut),
+        },
+      });
+      punchLogs.push(updated);
+    }
+
+    // 5. If neither IN nor OUT logs found, throw
+    if (!checkInLog && !checkOutLog) {
+      throw new Error(
+        "No manual IN or OUT logs found for this employee on the specified date"
+      );
+    }
+
+    // 6. Recalculate daily summary
+    const total =
+      checkIn && checkOut ? calculateHours(checkIn, checkOut) : 0;
+
+    const summary = await prisma.dailyAttendance.upsert({
+      where: {
+        employee_date_unique: {
+          employeeId,
+          date: workDate,
+        },
+      },
+      update: {
+        checkIn: checkIn ? new Date(checkIn) : null,
+        checkOut: checkOut ? new Date(checkOut) : null,
+        totalHours: total,
+        otHours: total > 9 ? total - 9 : 0,
+        status: total >= 9 ? "PRESENT" : total >= 4 ? "HALF_DAY" : "ABSENT",
+        source: "MANUAL",
+      },
+      create: {
+        // create only if summary doesn't exist yet
+        employeeId,
+        date: workDate,
+        checkIn: checkIn ? new Date(checkIn) : null,
+        checkOut: checkOut ? new Date(checkOut) : null,
+        totalHours: total,
+        otHours: total > 9 ? total - 9 : 0,
+        status: total >= 9 ? "PRESENT" : total >= 4 ? "HALF_DAY" : "ABSENT",
+        source: "MANUAL",
+      },
+    });
+
+    return { summary, logs: punchLogs };
+  } catch (error) {
+    console.error(error, "Error in updateManualAttendanceEntryService");
+    throw new Error(error.message || "Update attendance entry failed");
+  }
+};
 
 // Get all attendance logs (optionally filterable)
 export const getAllAttendanceLogsService = async () => {
@@ -268,12 +386,45 @@ export const getAllDailyAttendanceService = async () => {
 };
 
 // Get punch logs for an employee
-export const getAttendanceLogsByEmployeeIdService = async (employeeId) => {  
-  const logs = await prisma.attendanceLog.findUnique({
-    where: { id:employeeId },
-  });
+export const getAttendanceLogsByEmployeeIdService = async (logId) => {
+  try {
+    const attendanceLog = await prisma.attendanceLog.findUnique({
+      where: { id: logId },
+      include: {
+        employee: true,
+      },
+    });
 
-  return logs ;
+    if (!attendanceLog) throw new Error("Attendance log not found");
+
+    const date = new Date(attendanceLog.timestamp);
+    date.setHours(0, 0, 0, 0);
+
+    const dailyAttendance = await prisma.dailyAttendance.findUnique({
+      where: {
+        employee_date_unique: {
+          employeeId: attendanceLog.employeeId,
+          date,
+        },
+      },
+      select: {
+        id: true,
+        employeeId: true,
+        checkIn: true,
+        checkOut: true,
+        totalHours: true,
+        otHours: true,
+      },
+    });
+
+    return {
+      ...attendanceLog,
+      dailyAttendance,
+    };
+  } catch (error) {
+    console.error(error, " Error fetching attendance log and summary");
+    throw new Error(error.message || "Failed to fetch attendance log");
+  }
 };
 
 // Get daily summaries for an employee

@@ -12,12 +12,8 @@ interface EditDailyAttendanceFormProps {
 export default function EditDailyAttendanceForm({
   id,
 }: EditDailyAttendanceFormProps) {
-  const {
-    getDailyById,
-    selectedDaily,
-    updateDaily,
-    error,
-  } = useAttendanceStore();
+  const { getDailyById, selectedDaily, updateLog, error } =
+    useAttendanceStore();
 
   const { employees, fetchEmployees } = useEmployeeStore();
 
@@ -31,6 +27,11 @@ export default function EditDailyAttendanceForm({
     checkOut?: string;
   }>({});
 
+  console.log(
+    selectedDaily,
+    "selectedDailyselectedDailyselectedDailyselectedDaily"
+  );
+
   useEffect(() => {
     fetchEmployees();
     getDailyById(id);
@@ -38,9 +39,14 @@ export default function EditDailyAttendanceForm({
 
   useEffect(() => {
     if (selectedDaily) {
+      console.log(
+        selectedDaily.employeeId,
+        "selectedDaily.employeeIdselectedDaily.employeeIdselectedDaily.employeeIdselectedDaily.employeeId"
+      );
+
       setEmployeeId(selectedDaily.employeeId);
-      setCheckIn(selectedDaily.checkIn?.slice(0, 16) || "");
-      setCheckOut(selectedDaily.checkOut?.slice(0, 16) || "");
+      setCheckIn(selectedDaily.dailyAttendance?.checkIn?.slice(0, 16) || "");
+      setCheckOut(selectedDaily.dailyAttendance?.checkOut?.slice(0, 16) || "");
     }
   }, [selectedDaily]);
 
@@ -57,7 +63,7 @@ export default function EditDailyAttendanceForm({
     e.preventDefault();
     if (!validate()) return;
 
-    await updateDaily(id, {
+    await updateLog(id, {
       employeeId: Number(employeeId),
       checkIn,
       checkOut,

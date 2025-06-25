@@ -13,7 +13,6 @@ import Setting from "./pages/setting/Setting";
 import ListHoliday from "./pages/workforce/holiday/ListHoliday";
 import ListLeave from "./pages/workforce/leave/ListLeave";
 import Attendance from "./pages/attendance/Attendance";
-// import AddEmployeeForm from "./components/employee/form/AddEmployeeForm";
 
 function App() {
   return (

@@ -6,13 +6,18 @@ import {
   getDailyAttendanceByEmployeeId,
   getAllAttendanceLogs,
   getAllDailyAttendanceController,
-  getDailyAttendanceById
+  getDailyAttendanceById,
+  updateManualAttendanceEntry
 } from "../controller/attendanceController.js";
 
 const router = express.Router();
 
 router.post("/biometric", pushBiometricAttendance);
+
+// manual
 router.post("/manual", manualAttendanceEntry);
+router.put("/manualUpdate/:id", updateManualAttendanceEntry);
+
 
 // GET attendance logs
 router.get("/logs/:employeeId", getAttendanceLogsByEmployeeId);

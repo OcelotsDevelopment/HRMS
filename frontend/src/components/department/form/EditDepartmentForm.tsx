@@ -79,7 +79,7 @@ export default function EditDepartmentForm({
           />
         </div>
 
-        <div>
+        {/* <div>
           <Label>Head ID</Label>
           <Input
             type="number"
@@ -89,7 +89,7 @@ export default function EditDepartmentForm({
             placeholder="Enter head user ID"
             hint={errors.headId || ""}
           />
-        </div>
+        </div> */}
 
         <button
           type="submit"

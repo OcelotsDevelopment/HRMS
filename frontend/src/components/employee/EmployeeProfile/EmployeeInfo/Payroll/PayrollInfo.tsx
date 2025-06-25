@@ -12,6 +12,9 @@ import { useModal } from "../../../../../hooks/useModal";
 import { Modal } from "../../../../ui/modal";
 import AddPayrollForm from "./PayrollAddForm";
 
+  import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 interface PayrollRow {
   id: number;
   month: string;
@@ -22,12 +25,18 @@ interface PayrollRow {
   action: JSX.Element;
 }
 
+interface PayrollExportRow {
+  Month: string;
+  "Basic Salary": string;
+  Allowances: string;
+  Deductions: string;
+  "Net Salary": string;
+}
+
 export default function PayrollTable() {
-  const { id } = useParams(); // employeeId from URL
-  const { isOpen, openModal, closeModal } = useModal(); // modal state for add form
-
+  const { id } = useParams();
+  const { isOpen, openModal, closeModal } = useModal();
   const [tableData, setTableData] = useState<PayrollRow[]>([]);
-
   const { payrolls, fetchPayrolls } = useEmployeeStore();
 
   useEffect(() => {
@@ -35,40 +44,118 @@ export default function PayrollTable() {
   }, [id, fetchPayrolls]);
 
   useEffect(() => {
+    if (payrolls && Array.isArray(payrolls)) {
+      const formatted = payrolls.map((p) => ({
+        id: p.id!,
+        month: `${p.month.toString().padStart(2, "0")}/${p.year}`,
+        basicSalary: `₹ ${p.baseSalary.toFixed(2)}`,
+        allowances: `₹ ${(p.hra + (p.otherAllowances || 0)).toFixed(2)}`,
+        deductions: `₹ ${(
+          (p.epf || 0) +
+          (p.esi || 0) +
+          (p.taxDeduction || 0)
+        ).toFixed(2)}`,
+        netSalary: `₹ ${p.netPay?.toFixed(2) ?? "0.00"}`,
+        action: (
+          <div className="flex items-center">
+          <button
+            onClick={() => {
+              const exportData: PayrollExportRow[] = payrolls.map((pay) => ({
+                Month: `${pay.month.toString().padStart(2, "0")}/${pay.year}`,
+                "Basic Salary": `₹ ${pay.baseSalary.toFixed(2)}`,
+                Allowances: `₹ ${(pay.hra + (pay.otherAllowances || 0)).toFixed(
+                  2
+                )}`,
+                Deductions: `₹ ${(
+                  (pay.epf || 0) +
+                  (pay.esi || 0) +
+                  (pay.taxDeduction || 0)
+                ).toFixed(2)}`,
+                "Net Salary": `₹ ${pay.netPay?.toFixed(2) ?? "0.00"}`,
+              }));
+              downloadCSV(exportData, `payslip-${p.month}-${p.year}.csv`);
+            }}
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+          >
+            Download
+          </button>
 
-    console.log(payrolls,"payrollspayrollspayrollspayrollspayrolls");
-    
-  if (payrolls && Array.isArray(payrolls)) {
-    const formatted = payrolls.map((p) => ({
-      id: p.id!, // Add non-null assertion
-      month: `${p.month.toString().padStart(2, "0")}/${p.year}`, // e.g., 06/2025
-      basicSalary: `₹ ${p.baseSalary.toFixed(2)}`,
-      allowances: `₹ ${(p.hra + (p.otherAllowances || 0)).toFixed(2)}`,
-      deductions: `₹ ${(
-        (p.epf || 0) +
-        (p.esi || 0) +
-        (p.taxDeduction || 0)
-      ).toFixed(2)}`,
-      netSalary: `₹ ${p.netPay?.toFixed(2) ?? "0.00"}`,
-      action: (
-        <button
-          onClick={() => downloadPayslip(p.id!)}
-          className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-        >
-          Download
-        </button>
-      ),
-    }));
-    setTableData(formatted);
-  }
-}, [payrolls]);
+          <button
+      onClick={() =>
+        downloadPDF(
+          tableData.map((row) => ({
+            Month: row.month,
+            "Basic Salary": row.basicSalary,
+            Allowances: row.allowances,
+            Deductions: row.deductions,
+            "Net Salary": row.netSalary,
+          })),
+          "payroll.pdf"
+        )
+      }
+      className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.05]"
+    >
+      PDF
+    </button>
 
+    </div>
+        ),
+      }));
+      setTableData(formatted);
+    }
+  }, [payrolls]);
 
-  const downloadPayslip = async (payrollId: number) => {
-    // Simulated download logic
-    alert(`Downloading payslip for Payroll ID: ${payrollId}`);
-    // You could use `window.open(`/api/payroll/download/${payrollId}`)` or fetch blob if API supports
+  const downloadCSV = (data: PayrollExportRow[], filename = "payroll.csv") => {
+    if (!data.length) return;
+
+    const headers = Object.keys(data[0]);
+    const csvRows: string[] = [];
+
+    csvRows.push(headers.join(","));
+
+    for (const row of data) {
+      const values = [
+        JSON.stringify(row["Month"]),
+        JSON.stringify(row["Basic Salary"]),
+        JSON.stringify(row["Allowances"]),
+        JSON.stringify(row["Deductions"]),
+        JSON.stringify(row["Net Salary"]),
+      ];
+      csvRows.push(values.join(","));
+    }
+
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
   };
+
+
+const downloadPDF = (data: PayrollExportRow[], filename = "payroll.pdf") => {
+  const doc = new jsPDF();
+
+  const tableData = data.map((row) => [
+    row.Month,
+    row["Basic Salary"],
+    row.Allowances,
+    row.Deductions,
+    row["Net Salary"],
+  ]);
+
+  autoTable(doc, {
+    head: [["Month", "Basic Salary", "Allowances", "Deductions", "Net Salary"]],
+    body: tableData,
+    theme: "grid",
+  });
+
+  doc.save(filename);
+};
+
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] mt-6">

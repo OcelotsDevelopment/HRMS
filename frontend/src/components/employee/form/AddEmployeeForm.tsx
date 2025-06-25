@@ -61,21 +61,23 @@ export default function AddEmployeeForm() {
 
   useEffect(() => {
     if (findDepartments && Array.isArray(findDepartments)) {
-      const formatted = findDepartments.map((dep) => ({
-        value: dep.id,
-        label: dep.name,
-      }));
+      const formatted = [
+        { value: 0, label: "Select a user" },
+        ...findDepartments.map((dep) => ({
+          value: dep.id,
+          label: dep.name,
+        })),
+      ];
       setDepartmentOptions(formatted);
     }
   }, [findDepartments]);
 
   useEffect(() => {
-  if (userDepartmentOptions.length === 1) {
-    const onlyUser = userDepartmentOptions[0];
-    setForm((prev) => ({ ...prev, coordinatorId: onlyUser.value }));
-  }
-}, [userDepartmentOptions]);
-
+    if (userDepartmentOptions.length === 1) {
+      const onlyUser = userDepartmentOptions[0];
+      setForm((prev) => ({ ...prev, coordinatorId: onlyUser.value }));
+    }
+  }, [userDepartmentOptions]);
 
   useEffect(() => {
     if (findUserDepartments && Array.isArray(findUserDepartments)) {
@@ -101,9 +103,10 @@ export default function AddEmployeeForm() {
     if (!form.dob.trim()) newErrors.dob = "Date of birth is required.";
     if (!form.departmentId || form.departmentId <= 0)
       newErrors.departmentId = "Department is required.";
-    if (!form.coordinatorId || form.coordinatorId <= 0) {
+    if (!form.coordinatorId || form.coordinatorId <= 0)
       newErrors.coordinatorId = "User is required.";
-    }
+    if (!form.nationality.trim())
+      newErrors.nationality = "Nationality is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -241,6 +244,8 @@ export default function AddEmployeeForm() {
               type="text"
               value={form.nationality}
               onChange={handleChange}
+              error={!!errors.nationality}
+              hint={errors.nationality}
               placeholder="Indian / Other"
             />
           </div>

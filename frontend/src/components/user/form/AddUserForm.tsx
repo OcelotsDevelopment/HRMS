@@ -23,7 +23,7 @@ export default function AddUserForm() {
     departmentId?: string;
   }>({});
 
-    const addUser = useUserStore((state) => state.addUser);
+  const addUser = useUserStore((state) => state.addUser);
   const error = useUserStore((state) => state.error);
 
   const fetchDepartments = useDepartmentStore(
@@ -37,10 +37,14 @@ export default function AddUserForm() {
 
   useEffect(() => {
     if (findDepartments && Array.isArray(findDepartments)) {
-      const formatted: Department[] = findDepartments.map((department) => ({
-        value: department.id,
-        label: department.name,
-      }));
+      const formatted: Department[] = [
+        { value: 0, label: "Select a user" },
+        ...findDepartments.map((department) => ({
+          value: department.id,
+          label: department.name,
+        })),
+      ];
+
       setDepartmentOptions(formatted);
     }
   }, [findDepartments]);

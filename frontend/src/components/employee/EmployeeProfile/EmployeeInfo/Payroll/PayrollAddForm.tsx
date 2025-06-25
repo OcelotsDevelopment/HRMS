@@ -4,13 +4,29 @@ import Input from "../../../../input/InputField.tsx";
 import Label from "../../../../form-elements/Label.tsx";
 import { useEmployeeStore } from "../../../../../store/employeeStore.ts";
 import TextArea from "../../../../input/TextArea.tsx";
+import Select from "../../../../form/Select.tsx";
 
 interface AddPayrollFormProps {
   employeeId: number;
 }
 
+const monthOptions = [
+  { label: "January", value: 1 },
+  { label: "February", value: 2 },
+  { label: "March", value: 3 },
+  { label: "April", value: 4 },
+  { label: "May", value: 5 },
+  { label: "June", value: 6 },
+  { label: "July", value: 7 },
+  { label: "August", value: 8 },
+  { label: "September", value: 9 },
+  { label: "October", value: 10 },
+  { label: "November", value: 11 },
+  { label: "December", value: 12 },
+];
+
 export default function AddPayrollForm({ employeeId }: AddPayrollFormProps) {
-  const [month, setMonth] = useState("");
+  const [month, setMonth] = useState(0);
   const [year, setYear] = useState("");
   const [basicSalary, setBasicSalary] = useState("");
   const [hra, setHra] = useState("");
@@ -29,7 +45,7 @@ export default function AddPayrollForm({ employeeId }: AddPayrollFormProps) {
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!month) newErrors.month = "Month is required.";
+    if (!month || month <= 0) newErrors.month = "Month is required.";
     if (!year) newErrors.year = "Year is required.";
     if (!basicSalary) newErrors.basicSalary = "Base salary is required.";
     if (!hra) newErrors.hra = "HRA is required.";
@@ -86,7 +102,7 @@ export default function AddPayrollForm({ employeeId }: AddPayrollFormProps) {
         {error && <p className="text-red-400">{error}</p>}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
+          {/* <div>
             <Label>Month</Label>
             <Input
               type="number"
@@ -98,7 +114,22 @@ export default function AddPayrollForm({ employeeId }: AddPayrollFormProps) {
               error={!!errors.month}
               hint={errors.month || ""}
             />
+          </div> */}
+
+          <div>
+            <Label>Month</Label>
+            <Select
+              options={monthOptions}
+              placeholder="Select month"
+              onChange={(value) => setMonth(value)}
+              value={month}
+              className="dark:bg-dark-900"
+            />
+            {errors.month && (
+              <p className="mt-1 text-sm text-red-500">{errors.month}</p>
+            )}
           </div>
+
           <div>
             <Label>Year</Label>
             <Input

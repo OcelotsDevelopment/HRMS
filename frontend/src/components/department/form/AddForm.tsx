@@ -6,7 +6,7 @@ import { useDepartmentStore } from "../../../store/departmentStore.ts";
 
 export default function AddDepartmentForm() {
   const [name, setName] = useState("");
-  const [headId, setHeadId] = useState(0);
+  // const [headId, setHeadId] = useState(0);
   const [errors, setErrors] = useState<{ name?: string; headId?: string }>({});
   // const [successMessage, setSuccessMessage] = useState("");
 
@@ -32,7 +32,7 @@ export default function AddDepartmentForm() {
     e.preventDefault();
     if (!validate()) return;
     // setSuccessMessage("Your format is all correct, pleas÷e wait a moment.");
-    await addDepartment(name, headId);
+    await addDepartment(name, 0);
   };
 
   return (
@@ -51,7 +51,7 @@ export default function AddDepartmentForm() {
           />
         </div>
 
-        <div>
+        {/* <div>
           <Label>Head ID</Label>
           <Input
             type="number"
@@ -61,7 +61,7 @@ export default function AddDepartmentForm() {
             placeholder="Enter head user ID"
             hint={errors.headId || ""}
           />
-        </div>
+        </div> */}
 
         <button
           type="submit"

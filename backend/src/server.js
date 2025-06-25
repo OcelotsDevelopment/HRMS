@@ -13,6 +13,7 @@ import employeeRouter from "./routes/employeeRouter.js"
 import settingRouter from "./routes/settingRouter.js"
 import workforceRouter from "./routes/workforceRouter.js"
 import attendanceRouter from "./routes/attendanceRoute.js"
+import dashBoardRouter from "./routes/dashboardRoutes.js"
 
 
 import { errorHandler, notFound } from "./middlewares/errorMiddlware.js";
@@ -43,6 +44,7 @@ app.use("/api/department", departmentRouter);
 app.use("/api/setting", settingRouter);
 app.use("/api/workforce", workforceRouter);
 app.use("/api/attendance/", attendanceRouter);
+app.use("/api/dashboard/",dashBoardRouter)
 
 
 

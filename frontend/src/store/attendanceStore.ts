@@ -35,6 +35,14 @@ interface DailyAttendanceEntry {
   otHours: number | null;
   status: string;
   source: string;
+  dailyAttendance: {
+    checkIn: string;
+    checkOut: string;
+    employeeId: number;
+    id: string;
+    otHours: number;
+    totalHours: number;
+  };
   employee: {
     id: number;
     name: string;
@@ -65,7 +73,7 @@ type AttendanceState = {
   updateDaily: (id: string, data: Partial<DailyAttendance>) => Promise<void>;
 
   getLogById: (id: string) => Promise<void>;
-  updateLog: (id: string, data: Partial<AttendanceLog>) => Promise<void>;
+  updateLog: (id: string, data: Partial<DailyAttendance>) => Promise<void>;
 
   getDailyById: (id: string) => Promise<void>;
 };
@@ -121,6 +129,22 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
     }
   },
 
+  updateLog: async (id,data) => {
+    set({ loading: true, error: null });
+    console.log(data,"datadatadatadatadatadatadatadatadata");
+    
+    try {
+      const token = localStorage.getItem("auth_token");
+      await api.put(`/attendance/manualUpdate/${id}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      handleError(err, set);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   fetchDaily: async (employeeId) => {
     set({ loading: true, error: null });
     try {
@@ -147,6 +171,8 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
       set({ loading: false });
     }
   },
+
+  
 
   updateDaily: async (id, data) => {
     set({ loading: true, error: null });
@@ -175,30 +201,34 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
     }
   },
 
-  updateLog: async (id, data) => {
+  // updateLog: async (id, data) => {
+  //   set({ loading: true, error: null });
+  //   try {
+  //     const token = localStorage.getItem("auth_token");
+  //     await api.put(`/attendance/logs/${id}`, data, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+
+  //     // Optional: refresh logs
+  //     await useAttendanceStore.getState().fetchLogs();
+  //   } catch (err) {
+  //     handleError(err, set);
+  //   }
+  // },
+
+  getDailyById: async (employeeId) => {
     set({ loading: true, error: null });
+
     try {
       const token = localStorage.getItem("auth_token");
-      await api.put(`/attendance/logs/${id}`, data, {
+      const res = await api.get(`/attendance/logs/${employeeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Optional: refresh logs
-      await useAttendanceStore.getState().fetchLogs();
+      set({ selectedDaily: res.data, loading: false });
     } catch (err) {
-      handleError(err, set);
-    }
-  },
+      console.log(err, "aerererererererrerrerererererererererererere");
 
-  getDailyById: async (id) => {
-    set({ loading: true, error: null });
-    try {
-      const token = localStorage.getItem("auth_token");
-      const res = await api.get(`/attendance/daily/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ selectedDaily: res.data.daily, loading: false });
-    } catch (err) {
       handleError(err, set);
     }
   },

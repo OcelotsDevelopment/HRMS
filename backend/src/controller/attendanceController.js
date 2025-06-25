@@ -6,7 +6,8 @@ import {
   getDailyAttendanceByEmployeeIdService,
   getAllAttendanceLogsService,
   getAllDailyAttendanceService,
-  getDailyAttendanceByIdService
+  getDailyAttendanceByIdService,
+  updateManualAttendanceEntryService
 } from "../services/attendance.service.js";
 
 // @desc    Push biometric attendance (IN/OUT)
@@ -20,6 +21,15 @@ export const pushBiometricAttendance = asyncHandler(async (req, res) => {
 // @route   POST /api/attendance/manual
 export const manualAttendanceEntry = asyncHandler(async (req, res) => {
   const result = await manualAttendanceEntryService(req.body);
+  res.status(201).json(result);
+});
+
+// @desc    Manually enter attendance for employee
+// @route   POST /api/attendance/manual
+export const updateManualAttendanceEntry = asyncHandler(async (req, res) => {
+  console.log(req.params.id,"req.params.idreq.params.idreq.params.idreq.params.id");
+  
+  const result = await updateManualAttendanceEntryService(req.params.id,req.body);
   res.status(201).json(result);
 });
 

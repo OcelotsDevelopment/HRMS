@@ -5,7 +5,7 @@ import Label from "../../form-elements/Label";
 import { useAttendanceStore } from "../../../store/attendanceStore";
 
 interface EditDailyAttendanceFormProps {
-  attendanceId: string; // assuming it's a string (could also be number based on Prisma schema)
+  attendanceId: string; // DailyAttendance ID
 }
 
 export default function EditDailyAttendanceForm({ attendanceId }: EditDailyAttendanceFormProps) {
@@ -25,16 +25,26 @@ export default function EditDailyAttendanceForm({ attendanceId }: EditDailyAtten
     checkOut?: string;
   }>({});
 
+  // Fetch attendance record on mount
   useEffect(() => {
     if (attendanceId) {
       getDailyById(attendanceId);
     }
-  }, [attendanceId, getDailyById]);
+  }, [attendanceId]);
 
+  // Set state from fetched record
   useEffect(() => {
     if (selectedDaily) {
-      setCheckIn(selectedDaily.checkIn ? new Date(selectedDaily.checkIn).toISOString().slice(0, 16) : "");
-      setCheckOut(selectedDaily.checkOut ? new Date(selectedDaily.checkOut).toISOString().slice(0, 16) : "");
+      setCheckIn(
+        selectedDaily.dailyAttendance?.checkIn
+          ? new Date(selectedDaily.dailyAttendance?.checkIn).toISOString().slice(0, 16)
+          : ""
+      );
+      setCheckOut(
+        selectedDaily.checkOut
+          ? new Date(selectedDaily.checkOut).toISOString().slice(0, 16)
+          : ""
+      );
       setStatus(selectedDaily.status || "PRESENT");
     }
   }, [selectedDaily]);
