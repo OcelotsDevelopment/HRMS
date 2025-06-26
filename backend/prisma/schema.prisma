@@ -81,6 +81,9 @@ model Employee {
   leavesAssigned          Leave[]         @relation("EmployeeLeaves")
   leavesAppliedByEmployee Leave[]         @relation("AppliedLeaves")
 
+  // bank details
+  BankDetails BankDetail[] 
+
   // Legal/Personal Info
   liabilitiesDetails    String?
   familyBackground      String?
@@ -125,6 +128,22 @@ model Employment {
   remarks          String?
   employee         Employee @relation(fields: [employeeId], references: [id])
 }
+
+model BankDetail {
+  id            Int       @id @default(autoincrement())
+  bankName      String
+  accountNumber String
+  ifscCode      String
+  branch        String?
+  accountType   String?
+  upiId         String?
+  employeeId    Int
+  employee      Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+
 
 model Reference {
   id           Int      @id @default(autoincrement())
@@ -210,25 +229,30 @@ model HolidayType {
 
 // leave
 model Leave {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  leaveDate   DateTime
-  isPaid      Boolean  @default(true)
-
-  employeeId Int
-  employee   Employee @relation("EmployeeLeaves", fields: [employeeId], references: [id])
-
+  id                  Int       @id @default(autoincrement())
+  title               String
+  description         String?
+  from                DateTime
+  to                  DateTime
+  type                String
+  isPaid              Boolean   @default(true)
+  employeeId          Int
+  employee            Employee  @relation("EmployeeLeaves", fields: [employeeId], references: [id])
   appliedByEmployeeId Int?
   appliedByEmployee   Employee? @relation("AppliedLeaves", fields: [appliedByEmployeeId], references: [id])
+  appliedByUserId     Int?
+  appliedByUser       User?     @relation("UserAppliedLeaves", fields: [appliedByUserId], references: [id])
+  status              LeaveStatus @default(PENDING)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
 
-  appliedByUserId Int?
-  appliedByUser   User? @relation("UserAppliedLeaves", fields: [appliedByUserId], references: [id])
 
-  status LeaveStatus @default(PENDING)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum LeaveType {
+  SICK
+  CASUAL
+  UNPAID
+  MATERNITY
 }
 
 enum LeaveStatus {

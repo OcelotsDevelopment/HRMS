@@ -74,33 +74,30 @@ export const createLeaveService = async (data) => {
   const {
     title,
     description,
-    leaveDate,
+    from,
+    to,
+    type,
     isPaid,
     employeeId,
     appliedByEmployeeId,
     appliedByUserId,
   } = data;
 
-  if (!title?.trim()) throw new Error("Title is required");
-  if (!leaveDate || isNaN(new Date(leaveDate)))
-    throw new Error("Valid leave date is required");
-  if (!employeeId) throw new Error("Employee ID is required");
-
   const leave = await prisma.leave.create({
     data: {
-      title: title.trim(),
-      description: description?.trim() || null,
-      leaveDate: new Date(leaveDate),
-      isPaid: isPaid ?? true,
-      employeeId: Number(employeeId),
-      appliedByEmployeeId: appliedByEmployeeId
-        ? Number(appliedByEmployeeId)
-        : null,
-      appliedByUserId: appliedByUserId ? Number(appliedByUserId) : null,
+      title,
+      description,
+      from,
+      to,
+      type,
+      isPaid,
+      employeeId,
+      appliedByEmployeeId,
+      appliedByUserId,
     },
   });
 
-  return { leave };
+  return leave;
 };
 
 //  Get All Leaves
@@ -112,7 +109,7 @@ export const getAllLeavesService = async () => {
         appliedByEmployee: true,
         appliedByUser: true,
       },
-      orderBy: { leaveDate: "desc" },
+      orderBy: { from: "desc" }, // ✅ use 'from' instead of 'leaveDate'
     });
 
     return leaves;
@@ -137,17 +134,99 @@ export const getLeaveByIdService = async (id) => {
   return leave;
 };
 
-//  Update Leave
+// services/leave.service.ts
+export const getLeavesByEmployeeId = async (employeeId) => {
+  const employee = await prisma.employee.findUnique({
+    where: { id: employeeId },
+    select: {
+      id: true,
+      name: true,
+      employeeUniqueId: true,
+      dateOfJoining: true,
+    },
+  });
+
+  if (!employee) throw new Error("Employee not found");
+
+  const leaves = await prisma.leave.findMany({
+    where: { employeeId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const today = new Date();
+  const joinDate = new Date(employee.dateOfJoining);
+
+  // Total months from join date to current date
+  const monthsWorked =
+    (today.getFullYear() - joinDate.getFullYear()) * 12 +
+    (today.getMonth() - joinDate.getMonth()) + 1;
+
+    console.log(monthsWorked,"monthsWorkedmonthsWorkedmonthsWorkedmonthsWorkedmonthsWorked");
+    
+
+  const totalAccrued = monthsWorked * 1.5;
+
+  // Calculate total used leaves across all months
+  const totalUsed = leaves.reduce((acc, leave) => {
+    const from = new Date(leave.from);
+    const to = new Date(leave.to);
+    const days = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24) + 1;
+    return acc + days;
+  }, 0);
+  
+  const remaining = totalAccrued - totalUsed;
+  console.log(remaining,"remainingremainingremainingremainingremaining");
+
+  // Leaves used this current month
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  const usedThisMonth = leaves.reduce((acc, leave) => {
+    const from = new Date(leave.from);
+    const to = new Date(leave.to);
+
+    if (
+      from.getMonth() === currentMonth &&
+      from.getFullYear() === currentYear
+    ) {
+      const days = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24) + 1;
+      return acc + days;
+    }
+
+    return acc;
+  }, 0);
+
+  const availableThisMonth = 1.5; // per policy
+  const remainingThisMonth = Math.max(availableThisMonth - usedThisMonth, 0);
+
+  return {
+    leaves,
+    leaveBalance: {
+      totalAccrued: parseFloat(totalAccrued.toFixed(1)),
+      totalUsed: parseFloat(totalUsed.toFixed(1)),
+      remaining: parseFloat(Math.max(remaining, 0).toFixed(1)),
+
+      usedThisMonth: parseFloat(usedThisMonth.toFixed(1)),
+      availableThisMonth: parseFloat(availableThisMonth.toFixed(1)),
+      remainingThisMonth: parseFloat(remaining.toFixed(1)),
+    },
+  };
+};
+
+
 export const updateLeaveService = async (id, data) => {
   const leave = await prisma.leave.findUnique({ where: { id } });
   if (!leave) throw new Error("Leave not found");
-
   const updated = await prisma.leave.update({
     where: { id },
     data: {
-      ...data,
-      leaveDate: data.leaveDate ? new Date(data.leaveDate) : undefined,
-      status: data.status?.toUpperCase(), // <-- convert status to uppercase if present
+      title: data.title,
+      description: data.description,
+      from: data.from ? new Date(data.from) : undefined,
+      to: data.to ? new Date(data.to) : undefined,
+      type: data.type,
+      isPaid: typeof data.isPaid === "boolean" ? data.isPaid : undefined,
+      employeeId: data.employeeId,
+      status: data.status?.toUpperCase(), // "PENDING", "APPROVED", etc.
     },
   });
 
@@ -212,23 +291,21 @@ export const getEventByIdService = async (id) => {
 
 // Update Event
 export const updateEventService = async (id, data) => {
+  console.log(data, "daatatatatatatataatatatatatatata");
 
-  console.log(data,"daatatatatatatataatatatatatatata");
-  
   const { title, description, startDate, endDate, calendar, regionId } = data;
 
   const event = await prisma.event.findUnique({ where: { id } });
   if (!event) throw new Error("Event not found");
 
-   if (!title?.trim()) throw new Error("Event title is required");
+  if (!title?.trim()) throw new Error("Event title is required");
   if (!startDate || !endDate)
     throw new Error("Start and end dates are required");
   if (!calendar?.trim()) throw new Error("Event type (calendar) is required");
 
-
   const updatedEvent = await prisma.event.update({
     where: { id },
-     data: {
+    data: {
       title: title.trim(),
       description: description?.trim() || null,
       startDate: new Date(startDate),

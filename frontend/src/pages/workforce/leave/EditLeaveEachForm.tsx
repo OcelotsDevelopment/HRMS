@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
-import Input from "../../input/InputField";
-import TextArea from "../../input/TextArea";
-import Button from "../../ui/button/Button";
-import Label from "../../form/Label";
-import ComponentCard from "../../common/ComponentCard";
 import { useModal } from "../../../hooks/useModal";
 import { useEmployeeStore } from "../../../store/employeeStore";
 import { useWorkforceStore } from "../../../store/workforceStore";
+import ComponentCard from "../../../components/common/ComponentCard";
+import Label from "../../../components/form/Label";
+import Input from "../../../components/input/InputField";
+import TextArea from "../../../components/input/TextArea";
+import Button from "../../../components/ui/button/Button";
 
 interface EditLeaveFormProps {
   leaveId: number;
 }
 
-export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
+export default function EditLeaveEachForm({ leaveId }: EditLeaveFormProps) {
   const { closeModal } = useModal();
   const { getLeaveById, updateLeave, selectedLeave, error } = useWorkforceStore();
-  const { fetchEmployees, employees } = useEmployeeStore();
+  const { selectedEmployee } = useEmployeeStore();
 
   const [form, setForm] = useState({
     title: "",
@@ -32,11 +32,10 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
 
   useEffect(() => {
     getLeaveById(leaveId);
-    fetchEmployees();
-  }, [leaveId, getLeaveById, fetchEmployees]);
+  }, [leaveId, getLeaveById]);
 
   useEffect(() => {
-    if (selectedLeave) {
+    if (selectedLeave && selectedEmployee) {
       setForm({
         title: selectedLeave.title,
         description: selectedLeave.description || "",
@@ -44,25 +43,25 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
         to: selectedLeave.to.slice(0, 10),
         type: selectedLeave.type || "CASUAL",
         isPaid: selectedLeave.isPaid,
-        employeeId: selectedLeave.employeeId,
+        employeeId: selectedEmployee.id, // force set to current employee
         status: selectedLeave.status,
       });
     }
-  }, [selectedLeave]);
+  }, [selectedLeave, selectedEmployee]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.title.trim()) newErrors.title = "Leave title is required.";
     if (!form.from.trim()) newErrors.from = "From date is required.";
     if (!form.to.trim()) newErrors.to = "To date is required.";
-    if (!form.employeeId) newErrors.employeeId = "Employee is required.";
+    if (!form.employeeId) newErrors.employeeId = "Employee not found.";
     return newErrors;
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;;
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -143,6 +142,7 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
             <option value="SICK">Sick</option>
             <option value="EMERGENCY">Emergency</option>
             <option value="UNPAID">Unpaid</option>
+            <option value="MATERNITY">Maternity</option>
           </select>
         </div>
 
@@ -160,24 +160,9 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
           </select>
         </div>
 
-        <div>
-          <Label>Employee</Label>
-          <select
-            name="employeeId"
-            value={form.employeeId}
-            onChange={handleChange}
-            className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          >
-            <option value={0}>Select Employee</option>
-            {employees.map((emp) => (
-              <option key={emp.id} value={emp.id}>
-                {emp.name}
-              </option>
-            ))}
-          </select>
-          {errors.employeeId && (
-            <p className="mt-1 text-sm text-red-500">{errors.employeeId}</p>
-          )}
+        {/* Display selected employee name for clarity */}
+        <div className="text-sm text-gray-500 dark:text-white/70">
+          Editing leave for: <span className="font-medium">{selectedEmployee?.name}</span>
         </div>
 
         <div>

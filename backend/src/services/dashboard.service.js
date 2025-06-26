@@ -46,16 +46,6 @@ export const getDashboardOverviewService = async () => {
     }),
   ]);
 
-  const upcomingEvents = await prisma.event.findMany({
-    where: {
-      startDate: {
-        gte: new Date(),
-      },
-    },
-    orderBy: { startDate: "asc" },
-    take: 3,
-  });
-
   const today = new Date();
   const month = today.getMonth() + 1;
   const day = today.getDate();
@@ -67,14 +57,44 @@ export const getDashboardOverviewService = async () => {
       AND EXTRACT(DAY FROM "dob") = ${day}
   `;
 
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const holidaysToday = await prisma.holiday.findMany({
+    where: {
+      date: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+      date: true,
+      region: true,
+    },
+  });
+
+  const upcomingEvents = await prisma.event.findMany({
+    where: {
+      startDate: {
+        gte: new Date(),
+      },
+    },
+    orderBy: { startDate: "asc" },
+    take: 3,
+  });
+
   const demographics = await prisma.employee.groupBy({
-    by: ['nationality'],
+    by: ["nationality"],
     _count: {
       nationality: true,
     },
     orderBy: {
       _count: {
-        nationality: 'desc',
+        nationality: "desc",
       },
     },
   });
@@ -105,5 +125,6 @@ export const getDashboardOverviewService = async () => {
     demographics: formattedDemographics,
     upcomingEvents,
     birthdaysToday,
+    holidaysToday,
   };
 };

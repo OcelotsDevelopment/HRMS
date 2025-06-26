@@ -29,8 +29,17 @@ type OverviewData = {
     type: string;
     description?: string;
   }[];
+  holidaysToday: {
+    id: number;
+    title: string;
+    startDate: string;
+    endDate: string;
+    region?: {
+      id: number;
+      name: string;
+    };
+  }[];
 };
-
 
 type DashboardState = {
   data: OverviewData | null;
@@ -38,7 +47,6 @@ type DashboardState = {
   error: string | null;
   fetchDashboard: () => Promise<void>;
 };
-
 
 export const useDashboardStore = create<DashboardState>((set) => ({
   data: null,

@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
-import Input from "../../input/InputField";
-import TextArea from "../../input/TextArea";
-import Button from "../../ui/button/Button";
-import Label from "../../form/Label";
-import ComponentCard from "../../common/ComponentCard";
 import { useModal } from "../../../hooks/useModal";
 import { useEmployeeStore } from "../../../store/employeeStore";
 import { useWorkforceStore } from "../../../store/workforceStore";
+import ComponentCard from "../../../components/common/ComponentCard";
+import Label from "../../../components/form/Label";
+import Input from "../../../components/input/InputField";
+import TextArea from "../../../components/input/TextArea";
+import Button from "../../../components/ui/button/Button";
 
-interface EditLeaveFormProps {
-  leaveId: number;
-}
-
-export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
+export default function AddLeaveEachForm() {
   const { closeModal } = useModal();
-  const { getLeaveById, updateLeave, selectedLeave, error } = useWorkforceStore();
-  const { fetchEmployees, employees } = useEmployeeStore();
+  const { addLeave, error } = useWorkforceStore();
+  const { selectedEmployee } = useEmployeeStore();
 
   const [form, setForm] = useState({
     title: "",
@@ -31,38 +27,27 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    getLeaveById(leaveId);
-    fetchEmployees();
-  }, [leaveId, getLeaveById, fetchEmployees]);
-
-  useEffect(() => {
-    if (selectedLeave) {
-      setForm({
-        title: selectedLeave.title,
-        description: selectedLeave.description || "",
-        from: selectedLeave.from.slice(0, 10),
-        to: selectedLeave.to.slice(0, 10),
-        type: selectedLeave.type || "CASUAL",
-        isPaid: selectedLeave.isPaid,
-        employeeId: selectedLeave.employeeId,
-        status: selectedLeave.status,
-      });
+    // Set employeeId automatically if selectedEmployee exists
+    if (selectedEmployee?.id) {
+      setForm((prev) => ({ ...prev, employeeId: selectedEmployee.id }));
     }
-  }, [selectedLeave]);
+  }, [selectedEmployee]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.title.trim()) newErrors.title = "Leave title is required.";
     if (!form.from.trim()) newErrors.from = "From date is required.";
     if (!form.to.trim()) newErrors.to = "To date is required.";
-    if (!form.employeeId) newErrors.employeeId = "Employee is required.";
+    if (!form.employeeId) newErrors.employeeId = "Employee not found.";
     return newErrors;
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;;
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -76,19 +61,19 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await updateLeave(leaveId, {
+      await addLeave({
         ...form,
         from: new Date(form.from).toISOString(),
         to: new Date(form.to).toISOString(),
       });
       closeModal();
     } catch (err) {
-      console.error("Error updating leave:", err);
+      console.error("Error adding leave:", err);
     }
   };
 
   return (
-    <ComponentCard title="Edit Leave">
+    <ComponentCard title="Apply Leave">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-5">
         {error && (
           <p className="text-sm text-red-500 dark:text-white/90">{error}</p>
@@ -139,45 +124,12 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
             onChange={handleChange}
             className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           >
-            <option value="CASUAL">Casual</option>
-            <option value="SICK">Sick</option>
-            <option value="EMERGENCY">Emergency</option>
-            <option value="UNPAID">Unpaid</option>
+            <option value="">Select Type</option>
+            <option value="SICK">Sick Leave</option>
+            <option value="CASUAL">Casual Leave</option>
+            <option value="UNPAID">Unpaid Leave</option>
+            <option value="MATERNITY">Maternity Leave</option>
           </select>
-        </div>
-
-        <div>
-          <Label>Status</Label>
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          >
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        </div>
-
-        <div>
-          <Label>Employee</Label>
-          <select
-            name="employeeId"
-            value={form.employeeId}
-            onChange={handleChange}
-            className="w-full rounded border px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          >
-            <option value={0}>Select Employee</option>
-            {employees.map((emp) => (
-              <option key={emp.id} value={emp.id}>
-                {emp.name}
-              </option>
-            ))}
-          </select>
-          {errors.employeeId && (
-            <p className="mt-1 text-sm text-red-500">{errors.employeeId}</p>
-          )}
         </div>
 
         <div>
@@ -185,7 +137,9 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
           <TextArea
             placeholder="Description"
             value={form.description}
-            onChange={(val) => setForm((prev) => ({ ...prev, description: val }))}
+            onChange={(val) =>
+              setForm((prev) => ({ ...prev, description: val }))
+            }
             error={false}
             hint=""
           />
@@ -200,16 +154,25 @@ export default function EditLeaveForm({ leaveId }: EditLeaveFormProps) {
             onChange={handleChange}
             className="h-4 w-4 text-blue-600 border-gray-300 rounded"
           />
-          <Label htmlFor="isPaid" className="text-sm text-gray-700 dark:text-white">
+          <Label
+            htmlFor="isPaid"
+            className="text-sm text-gray-700 dark:text-white"
+          >
             Paid Leave
           </Label>
+        </div>
+
+        {/* Optional: display selected employee's name */}
+        <div className="text-sm text-gray-500 dark:text-white/70">
+          Applying for:{" "}
+          <span className="font-medium">{selectedEmployee?.name}</span>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
           <Button size="sm" variant="outline" onClick={closeModal}>
             Cancel
           </Button>
-          <Button size="sm">Update Leave</Button>
+          <Button size="sm">Apply Leave</Button>
         </div>
       </form>
     </ComponentCard>

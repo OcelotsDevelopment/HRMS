@@ -3,7 +3,7 @@ import Input from "../../input/InputField";
 import TextArea from "../../input/TextArea";
 import Button from "../../ui/button/Button";
 import Label from "../../form/Label";
-import { useEmployeeStore } from "../../../store/employeeStore"; // Assuming you have this for dropdown
+import { useEmployeeStore } from "../../../store/employeeStore";
 import { useWorkforceStore } from "../../../store/workforceStore";
 import { useModal } from "../../../hooks/useModal";
 import ComponentCard from "../../common/ComponentCard";
@@ -16,7 +16,9 @@ export default function AddLeaveForm() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    leaveDate: "",
+    from: "",
+    to: "",
+    type: "",
     isPaid: true,
     employeeId: 0,
   });
@@ -32,9 +34,9 @@ export default function AddLeaveForm() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const target = e.target as HTMLInputElement;
+    const target = e.target;
     const { name, type } = target;
-    const value = type === "checkbox" ? target.checked : target.value;
+    const value = type === "checkbox" ? (target as HTMLInputElement).checked : target.value;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -45,7 +47,9 @@ export default function AddLeaveForm() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.title.trim()) newErrors.title = "Leave title is required.";
-    if (!form.leaveDate.trim()) newErrors.leaveDate = "Leave date is required.";
+    if (!form.from.trim()) newErrors.from = "Start date is required.";
+    if (!form.to.trim()) newErrors.to = "End date is required.";
+    if (!form.type.trim()) newErrors.type = "Leave type is required.";
     if (!form.employeeId) newErrors.employeeId = "Please select an employee.";
     return newErrors;
   };
@@ -60,7 +64,8 @@ export default function AddLeaveForm() {
       await addLeave({
         ...form,
         employeeId: Number(form.employeeId),
-        leaveDate: new Date(form.leaveDate).toISOString(),
+        from: new Date(form.from).toISOString(),
+        to: new Date(form.to).toISOString(),
       });
       closeModal();
     } catch (err) {
@@ -92,15 +97,46 @@ export default function AddLeaveForm() {
           </div>
 
           <div>
-            <Label>Leave Date</Label>
+            <Label>From</Label>
             <Input
               type="date"
-              name="leaveDate"
-              value={form.leaveDate}
+              name="from"
+              value={form.from}
               onChange={handleChange}
-              error={!!errors.leaveDate}
-              hint={errors.leaveDate}
+              error={!!errors.from}
+              hint={errors.from}
             />
+          </div>
+
+          <div>
+            <Label>To</Label>
+            <Input
+              type="date"
+              name="to"
+              value={form.to}
+              onChange={handleChange}
+              error={!!errors.to}
+              hint={errors.to}
+            />
+          </div>
+
+          <div>
+            <Label>Leave Type</Label>
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            >
+              <option value="">Select Type</option>
+              <option value="SICK">Sick Leave</option>
+              <option value="CASUAL">Casual Leave</option>
+              <option value="UNPAID">Unpaid Leave</option>
+              <option value="MATERNITY">Maternity Leave</option>
+            </select>
+            {errors.type && (
+              <p className="mt-1 text-sm text-red-500">{errors.type}</p>
+            )}
           </div>
 
           <div>

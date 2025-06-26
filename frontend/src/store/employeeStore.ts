@@ -3,6 +3,20 @@ import { persist } from "zustand/middleware";
 import { api } from "../services/api";
 import axios from "axios";
 
+// bank details
+export interface BankDetail {
+  id: number;
+  bankName: string;
+  accountNumber: string;
+  ifscCode: string;
+  branch?: string;
+  accountType?: string;
+  upiId?: string;
+  employeeId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 type Department = {
   id: number;
   name: string;
@@ -74,7 +88,7 @@ type Payroll = {
 };
 type Employee = {
   id: number;
-  employeeUniqueId:string;
+  employeeUniqueId: string;
   name: string;
   email: string;
   mobile?: string;
@@ -89,9 +103,9 @@ type Employee = {
   nationality?: string;
   maritalStatus?: string;
   currentAddress?: string;
-  currentPinCode?: string;          
+  currentPinCode?: string;
   permanentAddress?: string;
-  permanentPinCode?: string;        
+  permanentPinCode?: string;
   departmentId?: number;
   coordinatorId?: number;
   coordinator?: User;
@@ -116,8 +130,8 @@ type Employee = {
   selectedEmployee: Employee | null;
   references?: Reference[];
   payrolls?: Payroll[];
+  bankDetails?: BankDetail[];
 };
-
 
 type EmployeeState = {
   employees: Employee[];
@@ -156,11 +170,18 @@ type EmployeeState = {
 
   payrolls: Payroll[];
   selectedPayroll: Payroll | null;
+  bankDetails: BankDetail[];
   fetchPayrolls: (employeeId: number) => Promise<void>;
   getPayrollById: (id: number) => Promise<void>;
   addPayroll: (data: Payroll) => Promise<void>;
   updatePayroll: (id: number, data: Payroll) => Promise<void>;
   deletePayroll: (id: number) => Promise<void>;
+
+  // Bank details
+  addBankDetail: (data: Partial<BankDetail>) => Promise<void>;
+  updateBankDetail: (id: number, data: Partial<BankDetail>) => Promise<void>;
+  fetchBankDetailsByEmployee: (employeeId: number) => Promise<void>;
+  deleteBankDetail: (id: number) => Promise<void>;
 };
 
 export const useEmployeeStore = create<EmployeeState>()(
@@ -178,6 +199,7 @@ export const useEmployeeStore = create<EmployeeState>()(
       // payroll
       payrolls: [],
       selectedPayroll: null,
+      bankDetails: [],
 
       loading: false,
       error: null,
@@ -409,7 +431,7 @@ export const useEmployeeStore = create<EmployeeState>()(
           const res = await api.get(`/employee/payrolls/${employeeId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          
+
           set({ payrolls: res.data.payrolls, loading: false });
         } catch (err) {
           handleError(err, set);
@@ -469,6 +491,78 @@ export const useEmployeeStore = create<EmployeeState>()(
             payrolls: state.payrolls.filter((p) => p.id !== id),
             loading: false,
           }));
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      // Bank Details
+      // Bank Details
+      addBankDetail: async (data) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          await api.post("/employee/bank", data, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (data.employeeId) {
+            await useEmployeeStore
+              .getState()
+              .fetchBankDetailsByEmployee(data.employeeId);
+          }
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      updateBankDetail: async (id, data) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          await api.put(`/employee/bank/${id}`, data, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (data.employeeId) {
+            await useEmployeeStore
+              .getState()
+              .fetchBankDetailsByEmployee(data.employeeId);
+          }
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      fetchBankDetailsByEmployee: async (employeeId) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          const res = await api.get(`/employee/bank/employee/${employeeId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+         
+          set({ bankDetails: res.data, loading: false });
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      deleteBankDetail: async (id) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          await api.delete(`/employee/bank-detail/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const employeeId = useEmployeeStore.getState().selectedEmployee?.id;
+          if (employeeId) {
+            await useEmployeeStore
+              .getState()
+              .fetchBankDetailsByEmployee(employeeId);
+          }
         } catch (err) {
           handleError(err, set);
         }

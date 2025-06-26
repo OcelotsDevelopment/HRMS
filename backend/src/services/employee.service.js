@@ -518,3 +518,28 @@ export const deletePayrollService = async (id) => {
 
   return { message: "Payroll deleted successfully" };
 };
+
+
+// Bank Details
+export const createBankDetailService = async (data) => {
+  return prisma.bankDetail.create({ data });
+};
+
+export const updateBankDetailService = async (id, data) => {
+  return prisma.bankDetail.update({ where: { id }, data });
+};
+
+export const deleteBankDetailService = async (id) => {
+  return prisma.bankDetail.delete({ where: { id } });
+};
+
+export const getBankDetailsByEmployeeService = async (employeeId) => {
+  return prisma.bankDetail.findMany({
+    where: { employeeId },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
+export const getBankDetailByIdService = async (id) => {
+  return prisma.bankDetail.findUnique({ where: { id } });
+};

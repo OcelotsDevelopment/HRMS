@@ -1,7 +1,7 @@
 import { useEffect, useState, type JSX } from "react";
-import DataTable from "../../common/DataTable";
-import { useWorkforceStore } from "../../../store/workforceStore";
-import Badge from "../../ui/badge/Badge";
+import DataTable from "../../../../common/DataTable";
+import { useWorkforceStore } from "../../../../../store/workforceStore";
+import Badge from "../../../../ui/badge/Badge";
 
 type LeaveRow = {
   id: number;
@@ -19,13 +19,13 @@ interface LeaveTableProps {
   openModal: (id: number) => void;
 }
 
-export default function LeaveTable({ openModal }: LeaveTableProps) {
-  const { leaves } = useWorkforceStore();
+export default function LeaveTableEach({ openModal }: LeaveTableProps) {
+  const { leavesEach } = useWorkforceStore();
   const [tableData, setTableData] = useState<LeaveRow[]>([]);
 
   useEffect(() => {
-    if (leaves && Array.isArray(leaves)) {
-      const formatted: LeaveRow[] = leaves.map((item) => ({
+    if (leavesEach && Array.isArray(leavesEach)) {
+      const formatted: LeaveRow[] = leavesEach.map((item) => ({
         id: item.id,
         title: item.title,
         type: item.type || "—",
@@ -60,7 +60,7 @@ export default function LeaveTable({ openModal }: LeaveTableProps) {
 
       setTableData(formatted);
     }
-  }, [leaves, openModal]);
+  }, [openModal,leavesEach]);
 
   const columns: {
     key: keyof LeaveRow;

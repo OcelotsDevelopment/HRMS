@@ -21,8 +21,17 @@ import {
   getPayrollsByEmployee,
   updatePayroll,
   deletePayroll,
+
+  // Bank Details
+  createBankDetail,
+  updateBankDetail,
+  deleteBankDetail,
+  getBankDetailsByEmployee,
+  getBankDetailById,
 } from "../controller/employeeController.js";
 
+import { verifyToken } from "../middlewares/tokenVerification.js";
+import { checkRole } from "../middlewares/checkRole.js";
 
 const router = express.Router();
 
@@ -52,5 +61,17 @@ router.get("/payroll/:id", getPayrollById);
 router.get("/payrolls/:employeeId", getPayrollsByEmployee);
 router.put("/payroll/:id", updatePayroll);
 router.delete("/payroll/:id", deletePayroll);
+
+
+// Bank Details
+// Bank Details Routes
+router.post("/bank", verifyToken, checkRole(["admin", "HR"]), createBankDetail);
+router.put("/bank/:id", verifyToken, checkRole(["admin", "HR"]), updateBankDetail);
+router.delete("/bank/:id", verifyToken, checkRole(["admin", "HR"]), deleteBankDetail);
+
+// Any authenticated user can view bank details of employees
+router.get("/bank/employee/:employeeId", verifyToken, getBankDetailsByEmployee);
+router.get("/bank/:id", verifyToken, getBankDetailById);
+
 
 export default router;

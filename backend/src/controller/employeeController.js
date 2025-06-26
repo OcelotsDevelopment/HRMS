@@ -21,16 +21,21 @@ import {
   getPayrollsByEmployeeService,
   updatePayrollService,
   deletePayrollService,
-  
   // Payroll
 
+  // Bank details
+  createBankDetailService,
+  updateBankDetailService,
+  deleteBankDetailService,
+  getBankDetailsByEmployeeService,
+  getBankDetailByIdService,
 } from "../services/employee.service.js";
 
 // @desc    Create new employee
 // @route   POST /api/employee
 export const createEmployee = asyncHandler(async (req, res) => {
-  console.log(req.body,"dfkshdflkhsdlf");
-  
+  console.log(req.body, "dfkshdflkhsdlf");
+
   const result = await createEmployeeService(req.body);
   res.status(201).json(result);
 });
@@ -56,7 +61,6 @@ export const updateEmployee = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-
 // @desc    Add employment for an employee
 // @route   POST /api/employee/:id/employment
 export const addEmployment = asyncHandler(async (req, res) => {
@@ -81,11 +85,10 @@ export const getEmploymentById = asyncHandler(async (req, res) => {
 // @desc    Update employment
 // @route   PUT /api/employee/employment/:employmentId
 export const updateEmployment = asyncHandler(async (req, res) => {
-
   const employmentId = Number(req.params.employmentId);
 
-  console.log(typeof employmentId,"empIdempIdempIdempIdempIdempIdempId");
-  
+  console.log(typeof employmentId, "empIdempIdempIdempIdempIdempIdempId");
+
   if (isNaN(employmentId)) {
     res.status(400).json({ message: "Invalid employment ID" });
     return;
@@ -95,14 +98,12 @@ export const updateEmployment = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-
 // @desc    Delete employment
 // @route   DELETE /api/employee/employment/:employmentId
 export const deleteEmployment = asyncHandler(async (req, res) => {
   const result = await deleteEmploymentService(Number(req.params.employmentId));
   res.status(200).json(result);
 });
-
 
 // @desc Add qualification
 // @route   POST /api/employee/qualification/
@@ -135,9 +136,7 @@ export const updateQualification = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-
 //      Payroll
-
 
 // @desc    Add single employment by ID
 // @route   POST /api/employee/payroll/
@@ -145,7 +144,6 @@ export const createPayroll = asyncHandler(async (req, res) => {
   const result = await createPayrollService(req.body);
   res.status(201).json(result);
 });
-
 
 // @desc    Fetch single employment by ID
 // @route   GET /api/employee/payrollById/:id
@@ -157,7 +155,9 @@ export const getPayrollById = asyncHandler(async (req, res) => {
 // @desc    Fetch single employment by ID
 // @route   GET /api/employee/payroll/
 export const getPayrollsByEmployee = asyncHandler(async (req, res) => {
-  const result = await getPayrollsByEmployeeService(Number(req.params.employeeId));
+  const result = await getPayrollsByEmployeeService(
+    Number(req.params.employeeId)
+  );
   res.status(200).json(result);
 });
 
@@ -172,5 +172,45 @@ export const updatePayroll = asyncHandler(async (req, res) => {
 // @route   DELETE /api/employee/payroll/delete
 export const deletePayroll = asyncHandler(async (req, res) => {
   const result = await deletePayrollService(Number(req.params.id));
+  res.status(200).json(result);
+});
+
+// @desc    Create bank detail
+// @route   POST /api/employee/bank
+export const createBankDetail = asyncHandler(async (req, res) => {
+  const result = await createBankDetailService(req.body);
+  res.status(201).json(result);
+});
+
+// @desc    Update bank detail
+// @route   PUT /api/employee/bank/:id
+export const updateBankDetail = asyncHandler(async (req, res) => {
+  const result = await updateBankDetailService(Number(req.params.id), req.body);
+  res.status(200).json(result);
+});
+
+// @desc    Delete bank detail
+// @route   DELETE /api/employee/bank/:id
+export const deleteBankDetail = asyncHandler(async (req, res) => {
+  const result = await deleteBankDetailService(Number(req.params.id));
+  res.status(200).json(result);
+});
+
+// @desc    Get all bank details by employee
+// @route   GET /api/employee/bank/employee/:employeeId
+export const getBankDetailsByEmployee = asyncHandler(async (req, res) => {
+  const result = await getBankDetailsByEmployeeService(
+    Number(req.params.employeeId)
+  );
+
+  console.log(result,"resultresultresultresultresultresultresult");
+  
+  res.status(200).json(result);
+});
+
+// @desc    Get single bank detail by ID
+// @route   GET /api/employee/bank/:id
+export const getBankDetailById = asyncHandler(async (req, res) => {
+  const result = await getBankDetailByIdService(Number(req.params.id));
   res.status(200).json(result);
 });

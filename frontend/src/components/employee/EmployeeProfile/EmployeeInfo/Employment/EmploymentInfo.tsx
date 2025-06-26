@@ -23,6 +23,12 @@ function EmploymentInfo() {
     useEmployeeStore();
 
   useEffect(() => {
+    if (selectedEmployee) {
+      closeEditModal();
+      closeModal();
+    }
+  }, [selectedEmployee, closeModal]);
+  useEffect(() => {
     fetchEmployments(Number(id));
   }, [fetchEmployments, id, selectedEmployee]);
 
@@ -135,7 +141,7 @@ function EmploymentInfo() {
                     Last Salary Drawn
                   </p>
                   <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                   {employment?.lastSalaryDrawn}
+                    {employment?.lastSalaryDrawn}
                   </p>
                 </div>
 

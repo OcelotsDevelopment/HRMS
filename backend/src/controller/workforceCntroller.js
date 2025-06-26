@@ -9,6 +9,7 @@ import {
   createLeaveService,
   getAllLeavesService,
   getLeaveByIdService,
+  getLeavesByEmployeeId,
   updateLeaveService,
   deleteLeaveService,
 
@@ -67,12 +68,49 @@ export const deleteHolidayController = async (req, res) => {
 
 //  leave
 // Create Leave
+// @desc    Create a new leave entry
+// @route   POST /api/workforce/leave
+// @access  Private (Auth required)
 export const createLeaveController = async (req, res) => {
   try {
-    const leave = await createLeaveService(req.body);
-    res.status(201).json({ success: true, leave });
+    const {
+      title,
+      description,
+      from,
+      to,
+      type,
+      isPaid = true,
+      employeeId,
+      appliedByEmployeeId,
+      appliedByUserId,
+    } = req.body;
+
+    // Basic validation
+    if (!title || !from || !to || !type || !employeeId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: title, from, to, type, employeeId",
+      });
+    }
+
+    const leave = await createLeaveService({
+      title,
+      description,
+      from: new Date(from),
+      to: new Date(to),
+      type,
+      isPaid,
+      employeeId: Number(employeeId),
+      appliedByEmployeeId,
+      appliedByUserId,
+    });
+
+    return res.status(201).json({ success: true, leave });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    console.error("Error creating leave:", err);
+    res
+      .status(400)
+      .json({ success: false, message: err.message || "Something went wrong" });
   }
 };
 
@@ -96,6 +134,26 @@ export const getLeaveByIdController = async (req, res) => {
   }
 };
 
+// leave by employee
+
+export const getLeavesByEmployee = async (req, res) => {
+  try {
+    const employeeId = Number(req.params.id);
+
+    if (isNaN(employeeId)) {
+      return res.status(400).json({ message: "Invalid employee ID" });
+    }
+
+    const result = await getLeavesByEmployeeId(employeeId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching leaves by employee:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 // Update Leave
 export const updateLeaveController = async (req, res) => {
   try {
@@ -110,7 +168,9 @@ export const updateLeaveController = async (req, res) => {
 export const deleteLeaveController = async (req, res) => {
   try {
     await deleteLeaveService(Number(req.params.id));
-    res.status(200).json({ success: true, message: "Leave deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Leave deleted successfully" });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }

@@ -6,7 +6,7 @@ import {
   updateHolidayController,
   deleteHolidayController,
   // leave
-   createLeaveController,
+  createLeaveController,
   getAllLeavesController,
   getLeaveByIdController,
   updateLeaveController,
@@ -18,10 +18,10 @@ import {
   getEventByIdController,
   updateEventController,
   deleteEventController,
+  getLeavesByEmployee,
 } from "../controller/workforceCntroller.js";
 
 const router = Router();
-
 
 // Holiday
 router.get("/holiday", getAllHolidaysController);
@@ -35,10 +35,10 @@ router.delete("/holiday/:id", deleteHolidayController);
 // Leave Endpoints
 router.get("/leave", getAllLeavesController);
 router.get("/leave/:id", getLeaveByIdController);
+router.get("/leave/leave-by-employee/:id", getLeavesByEmployee);
 router.post("/leave", createLeaveController);
 router.put("/leave/:id", updateLeaveController);
 router.delete("/leave/:id", deleteLeaveController);
-
 
 //  Event Routes
 router.get("/event", getAllEventsController);

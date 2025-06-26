@@ -53,13 +53,29 @@ type Employee = {
   isPhysicallyImpaired?: boolean;
   impairmentDetails?: string;
 };
-// Leave
 
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  departmentId: number;
+  createdAt: string;
+  updatedAt: string;
+  headOf?: {
+    id: number;
+    name: string;
+  };
+};
+
+// Leave
 export type Leave = {
   id: number;
   title: string;
   description?: string;
-  leaveDate: string;
+  from: string;
+  to: string;
+  type: string;
   isPaid: boolean;
   status: "Pending" | "Approved" | "Rejected";
   employeeId: number;
@@ -67,11 +83,17 @@ export type Leave = {
   appliedByEmployeeId?: number | null;
   appliedByUserId?: number | null;
   employee?: Employee | null;
+  appliedByEmployee?: Employee | null;
+  appliedByUser?: User | null;
   createdAt: string;
   updatedAt: string;
 };
 
-
+// type LeaveGroup = {
+//   employeeId: number;
+//   name: string;
+//   leaves: Leave[];
+// };
 // event
 export type Event = {
   id: number;
@@ -85,6 +107,13 @@ export type Event = {
   createdAt: string;
   updatedAt: string;
 };
+
+interface LeaveBalance {
+  totalAccrued: number;
+  totalUsed: number;
+  remaining: number;
+  remainingThisMonth:number;
+}
 
 type WorkspaceState = {
   holidays: Holiday[];
@@ -102,8 +131,10 @@ type WorkspaceState = {
   // Leave
   leaves: Leave[];
   selectedLeave: Leave | null;
-
+  leavesEach: Leave[];
+leaveBalanceEach: LeaveBalance | null;
   fetchLeaves: () => Promise<void>;
+  fetchLeavesEach: (id: number) => Promise<void>;
   getLeaveById: (id: number) => Promise<void>;
   addLeave: (data: Partial<Leave>) => Promise<void>;
   updateLeave: (id: number, data: Partial<Leave>) => Promise<void>;
@@ -132,6 +163,9 @@ export const useWorkforceStore = create<WorkspaceState>()(
       // leave
       leaves: [],
       selectedLeave: null,
+      leavesEach: [],
+      leaveBalanceEach:null,
+
       // events
       events: [],
       selectedEvent: null,
@@ -234,19 +268,39 @@ export const useWorkforceStore = create<WorkspaceState>()(
         }
       },
 
-      addLeave: async (data) => {
+      fetchLeavesEach: async (id) => {
+        const res = await api.get(`/workforce/leave/leave-by-employee/${id}`); 
+        set({
+    leavesEach: res.data.leaves,
+    leaveBalanceEach: res.data.leaveBalance,
+  });
+      },
+      addLeave: async (data: Partial<Leave>) => {
         try {
           const token = localStorage.getItem("auth_token");
-          await api.post("/workforce/leave", data, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          await api.post(
+            "/workforce/leave",
+            {
+              title: data.title,
+              description: data.description,
+              from: data.from,
+              to: data.to,
+              type: data.type,
+              isPaid: data.isPaid ?? true,
+              employeeId: data.employeeId,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
           await useWorkforceStore.getState().fetchLeaves();
         } catch (error) {
           handleError(error, set);
         }
       },
 
-      updateLeave: async (id, data) => {
+      updateLeave: async (id: number, data: Partial<Leave>) => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem("auth_token");

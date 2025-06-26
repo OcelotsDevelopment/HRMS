@@ -36,6 +36,7 @@ export default function EditEmployeeForm({ employee }: Props) {
     maritalStatus: "",
     departmentId: 0,
     coordinatorId: 0,
+    dateOfJoining: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -51,7 +52,7 @@ export default function EditEmployeeForm({ employee }: Props) {
     (state) => state.fetchDepartments
   );
 
-   const fetchUsersDepartment = useDepartmentStore(
+  const fetchUsersDepartment = useDepartmentStore(
     (state) => state.fetchUsersDepartment
   );
   const findDepartments = useDepartmentStore((state) => state.findDepartments);
@@ -105,6 +106,9 @@ export default function EditEmployeeForm({ employee }: Props) {
         maritalStatus: selectedEmployee.maritalStatus || "",
         departmentId: selectedEmployee.departmentId || 0,
         coordinatorId: selectedEmployee.coordinatorId || 0,
+        dateOfJoining: selectedEmployee.dateOfJoining
+          ? selectedEmployee.dateOfJoining.split("T")[0]
+          : "",
       });
     }
   }, [selectedEmployee, employee.id]);
@@ -121,6 +125,8 @@ export default function EditEmployeeForm({ employee }: Props) {
       newErrors.departmentId = "Department is required.";
     if (!form.coordinatorId || form.coordinatorId <= 0) {
       newErrors.coordinatorId = "User is required.";
+      if (!form.dateOfJoining)
+        newErrors.dateOfJoining = "Date of joining is required.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -138,6 +144,7 @@ export default function EditEmployeeForm({ employee }: Props) {
       ...form,
       age: Number(form.age),
       departmentId: Number(form.departmentId),
+      dateOfJoining: new Date(form.dateOfJoining).toISOString(), // ✅ Ensure ISO string format if backend expects it
     });
   };
 
@@ -218,6 +225,18 @@ export default function EditEmployeeForm({ employee }: Props) {
               hint={errors.dob}
             />
           </div>
+          <div>
+            <Label>Date of Joining</Label>
+            <Input
+              name="dateOfJoining"
+              type="date"
+              value={form.dateOfJoining}
+              onChange={handleChange}
+              placeholder="YYYY-MM-DD"
+              error={!!errors.dateOfJoining}
+              hint={errors.dateOfJoining}
+            />
+          </div>
 
           <div>
             <Label>Age</Label>
@@ -279,11 +298,10 @@ export default function EditEmployeeForm({ employee }: Props) {
             <Select
               options={departmentOptions}
               placeholder="Select department"
-              onChange={async (val) =>{
-                setForm((prev) => ({ ...prev, departmentId: Number(val) }))
+              onChange={async (val) => {
+                setForm((prev) => ({ ...prev, departmentId: Number(val) }));
                 await fetchUsersDepartment(Number(val));
-              }
-              }
+              }}
               value={form.departmentId}
               className="dark:bg-dark-900"
             />

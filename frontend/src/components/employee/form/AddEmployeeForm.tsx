@@ -25,6 +25,7 @@ export default function AddEmployeeForm() {
     dob: "",
     age: "",
     placeOfBirth: "",
+    dateOfJoining: "",
     bloodGroup: "",
     nationality: "",
     maritalStatus: "",
@@ -107,6 +108,8 @@ export default function AddEmployeeForm() {
       newErrors.coordinatorId = "User is required.";
     if (!form.nationality.trim())
       newErrors.nationality = "Nationality is required.";
+    if (!form.dateOfJoining.trim())
+      newErrors.dateOfJoining = "Date of joining is required.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -123,6 +126,7 @@ export default function AddEmployeeForm() {
       ...form,
       age: Number(form.age),
       departmentId: Number(form.departmentId),
+      dateOfJoining: new Date(form.dateOfJoining).toISOString(), // optional
     });
   };
 
@@ -201,6 +205,18 @@ export default function AddEmployeeForm() {
               onChange={handleChange}
               error={!!errors.dob}
               hint={errors.dob}
+            />
+          </div>
+
+          <div>
+            <Label>Date of Joining</Label>
+            <Input
+              name="dateOfJoining"
+              type="date"
+              value={form.dateOfJoining}
+              onChange={handleChange}
+              error={!!errors.dateOfJoining}
+              hint={errors.dateOfJoining}
             />
           </div>
 
