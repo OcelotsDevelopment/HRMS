@@ -101,18 +101,31 @@ export const createLeaveService = async (data) => {
 };
 
 //  Get All Leaves
-export const getAllLeavesService = async () => {
+export const getAllLeavesService = async (page = 1, status = "") => {
   try {
-    const leaves = await prisma.leave.findMany({
-      include: {
-        employee: true,
-        appliedByEmployee: true,
-        appliedByUser: true,
-      },
-      orderBy: { from: "desc" }, // ✅ use 'from' instead of 'leaveDate'
-    });
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-    return leaves;
+    const where = status ? { status } : {}; // Apply status filter if provided
+
+    const [leaves, totalCount] = await Promise.all([
+      prisma.leave.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { from: "desc" },
+        include: {
+          employee: true,
+          appliedByEmployee: true,
+          appliedByUser: true,
+        },
+      }),
+      prisma.leave.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return { leaves, totalPages };
   } catch (error) {
     console.error("Get All Leaves Error:", error);
     throw new Error("Failed to fetch leave records");
@@ -159,10 +172,8 @@ export const getLeavesByEmployeeId = async (employeeId) => {
   // Total months from join date to current date
   const monthsWorked =
     (today.getFullYear() - joinDate.getFullYear()) * 12 +
-    (today.getMonth() - joinDate.getMonth()) + 1;
-
-    console.log(monthsWorked,"monthsWorkedmonthsWorkedmonthsWorkedmonthsWorkedmonthsWorked");
-    
+    (today.getMonth() - joinDate.getMonth()) +
+    1;
 
   const totalAccrued = monthsWorked * 1.5;
 
@@ -173,9 +184,9 @@ export const getLeavesByEmployeeId = async (employeeId) => {
     const days = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24) + 1;
     return acc + days;
   }, 0);
-  
+
   const remaining = totalAccrued - totalUsed;
-  console.log(remaining,"remainingremainingremainingremainingremaining");
+  console.log(remaining, "remainingremainingremainingremainingremaining");
 
   // Leaves used this current month
   const currentMonth = today.getMonth();
@@ -211,7 +222,6 @@ export const getLeavesByEmployeeId = async (employeeId) => {
     },
   };
 };
-
 
 export const updateLeaveService = async (id, data) => {
   const leave = await prisma.leave.findUnique({ where: { id } });

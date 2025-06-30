@@ -19,6 +19,7 @@ export default function EmployeeProfiles() {
     dob: "",
     age: "",
     placeOfBirth: "",
+    profileImageUrl:"",
     bloodGroup: "",
     nationality: "",
     maritalStatus: "",
@@ -35,6 +36,7 @@ export default function EmployeeProfiles() {
   }, [getEmployeeById, id, employees]);
 
   useEffect(() => {
+    
     if (selectedEmployee) {
       setForm({
         name: selectedEmployee.name || "",
@@ -45,6 +47,7 @@ export default function EmployeeProfiles() {
         dob: selectedEmployee.dob ? selectedEmployee.dob.split("T")[0] : "",
         age: selectedEmployee.age?.toString() || "",
         placeOfBirth: selectedEmployee.placeOfBirth || "",
+        profileImageUrl:selectedEmployee?.profileImageUrl || "",
         bloodGroup: selectedEmployee.bloodGroup || "",
         nationality: selectedEmployee.nationality || "",
         maritalStatus: selectedEmployee.maritalStatus || "",
@@ -72,7 +75,9 @@ export default function EmployeeProfiles() {
             id={Number(id)}
             name={form.name}
             designation={form?.designation}
+            sex={form?.sex}
             placeOfBirth={form?.placeOfBirth}
+            profileImageUrl={form?.profileImageUrl}
             department={form?.department}
             coordinator={form?.coordinator}
             departmentId={form?.departmentId}

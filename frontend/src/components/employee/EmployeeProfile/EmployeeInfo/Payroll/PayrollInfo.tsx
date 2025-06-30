@@ -12,7 +12,7 @@ import { useModal } from "../../../../../hooks/useModal";
 import { Modal } from "../../../../ui/modal";
 import AddPayrollForm from "./PayrollAddForm";
 
-  import jsPDF from "jspdf";
+import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 interface PayrollRow {
@@ -45,6 +45,7 @@ export default function PayrollTable() {
 
   useEffect(() => {
     if (payrolls && Array.isArray(payrolls)) {
+      closeModal();
       const formatted = payrolls.map((p) => ({
         id: p.id!,
         month: `${p.month.toString().padStart(2, "0")}/${p.year}`,
@@ -57,48 +58,47 @@ export default function PayrollTable() {
         ).toFixed(2)}`,
         netSalary: `₹ ${p.netPay?.toFixed(2) ?? "0.00"}`,
         action: (
-          <div className="flex items-center">
-          <button
-            onClick={() => {
-              const exportData: PayrollExportRow[] = payrolls.map((pay) => ({
-                Month: `${pay.month.toString().padStart(2, "0")}/${pay.year}`,
-                "Basic Salary": `₹ ${pay.baseSalary.toFixed(2)}`,
-                Allowances: `₹ ${(pay.hra + (pay.otherAllowances || 0)).toFixed(
-                  2
-                )}`,
-                Deductions: `₹ ${(
-                  (pay.epf || 0) +
-                  (pay.esi || 0) +
-                  (pay.taxDeduction || 0)
-                ).toFixed(2)}`,
-                "Net Salary": `₹ ${pay.netPay?.toFixed(2) ?? "0.00"}`,
-              }));
-              downloadCSV(exportData, `payslip-${p.month}-${p.year}.csv`);
-            }}
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-          >
-            Download
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const exportData: PayrollExportRow[] = payrolls.map((pay) => ({
+                  Month: `${pay.month.toString().padStart(2, "0")}/${pay.year}`,
+                  "Basic Salary": `₹ ${pay.baseSalary.toFixed(2)}`,
+                  Allowances: `₹ ${(
+                    pay.hra + (pay.otherAllowances || 0)
+                  ).toFixed(2)}`,
+                  Deductions: `₹ ${(
+                    (pay.epf || 0) +
+                    (pay.esi || 0) +
+                    (pay.taxDeduction || 0)
+                  ).toFixed(2)}`,
+                  "Net Salary": `₹ ${pay.netPay?.toFixed(2) ?? "0.00"}`,
+                }));
+                downloadCSV(exportData, `payslip-${p.month}-${p.year}.csv`);
+              }}
+              className="rounded border px-3 py-1 text-xs text-gray-700 shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              CSV
+            </button>
 
-          <button
-      onClick={() =>
-        downloadPDF(
-          tableData.map((row) => ({
-            Month: row.month,
-            "Basic Salary": row.basicSalary,
-            Allowances: row.allowances,
-            Deductions: row.deductions,
-            "Net Salary": row.netSalary,
-          })),
-          "payroll.pdf"
-        )
-      }
-      className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.05]"
-    >
-      PDF
-    </button>
-
-    </div>
+            <button
+              onClick={() =>
+                downloadPDF(
+                  tableData.map((row) => ({
+                    Month: row.month,
+                    "Basic Salary": row.basicSalary,
+                    Allowances: row.allowances,
+                    Deductions: row.deductions,
+                    "Net Salary": row.netSalary,
+                  })),
+                  "payroll.pdf"
+                )
+              }
+              className="rounded border px-3 py-1 text-xs text-gray-700 shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
+              PDF
+            </button>
+          </div>
         ),
       }));
       setTableData(formatted);
@@ -135,27 +135,27 @@ export default function PayrollTable() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadPDF = (data: PayrollExportRow[], filename = "payroll.pdf") => {
+    const doc = new jsPDF();
 
-const downloadPDF = (data: PayrollExportRow[], filename = "payroll.pdf") => {
-  const doc = new jsPDF();
+    const tableData = data.map((row) => [
+      row.Month,
+      row["Basic Salary"],
+      row.Allowances,
+      row.Deductions,
+      row["Net Salary"],
+    ]);
 
-  const tableData = data.map((row) => [
-    row.Month,
-    row["Basic Salary"],
-    row.Allowances,
-    row.Deductions,
-    row["Net Salary"],
-  ]);
+    autoTable(doc, {
+      head: [
+        ["Month", "Basic Salary", "Allowances", "Deductions", "Net Salary"],
+      ],
+      body: tableData,
+      theme: "grid",
+    });
 
-  autoTable(doc, {
-    head: [["Month", "Basic Salary", "Allowances", "Deductions", "Net Salary"]],
-    body: tableData,
-    theme: "grid",
-  });
-
-  doc.save(filename);
-};
-
+    doc.save(filename);
+  };
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03] mt-6">

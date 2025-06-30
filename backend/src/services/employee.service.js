@@ -1,4 +1,5 @@
 import { prisma } from "../config/db.js";
+import { uploadToCloudflare } from "../utils/cloudflareUploader.js";
 
 function isValidDate(input) {
   const date = new Date(input);
@@ -175,6 +176,8 @@ export const getAllEmployeesService = async () => {
 };
 
 export const getEmployeeByIdService = async (id) => {
+  if (!id) throw new Error("Employee ID is required");
+
   const employee = await prisma.employee.findUnique({
     where: { id },
     include: {
@@ -302,6 +305,28 @@ export const updateEmploymentService = async (id, data) => {
 
   return { employment };
 };
+
+// Update Image
+export const uploadEmployeeImageService = async (id, fileBuffer, originalName) => {
+  const employee = await prisma.employee.findUnique({ where: { id: Number(id) } });
+  if (!employee) throw new Error("Employee not found");
+
+  const cloudflareResult = await uploadToCloudflare(fileBuffer, originalName);
+
+  const imageUrl = cloudflareResult?.result?.variants?.[0];
+  if (!imageUrl) throw new Error("Image upload failed");
+
+  await prisma.employee.update({
+    where: { id: Number(id) },
+    data: {
+      profileImageUrl: imageUrl,
+    },
+  });
+
+  return imageUrl;
+};
+
+
 
 // Delete employment
 export const deleteEmploymentService = async (id) => {
@@ -446,6 +471,37 @@ export const createPayrollService = async (data) => {
   }
 };
 
+export const getAllPayrollsService = async (page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const [payrolls, total] = await Promise.all([
+    prisma.payroll.findMany({
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        employee: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    }),
+    prisma.payroll.count(),
+  ]);
+
+  return {
+    payrolls,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
 // Get Payroll by ID
 export const getPayrollByIdService = async (id) => {
   const payroll = await prisma.payroll.findUnique({
@@ -518,7 +574,6 @@ export const deletePayrollService = async (id) => {
 
   return { message: "Payroll deleted successfully" };
 };
-
 
 // Bank Details
 export const createBankDetailService = async (data) => {

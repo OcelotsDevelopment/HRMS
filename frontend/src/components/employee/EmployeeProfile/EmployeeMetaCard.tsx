@@ -5,14 +5,19 @@ import Input from "../../form/input/InputField";
 import Label from "../../form/Label";
 import Select from "../../form/Select";
 import { useDepartmentStore } from "../../../store/departmentStore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useEmployeeStore } from "../../../store/employeeStore";
-
+import getCroppedImg from "../../../utils/cropImageHelper";
+import type { Area } from "react-easy-crop";
+import Cropper from "react-easy-crop";
+import { useUploadStore } from "../../../store/uploadStore";
 interface UserMetaCardProps {
   id: number;
   name: string;
   designation: string;
+  sex: string;
   placeOfBirth: string;
+  profileImageUrl: string;
   department: string;
   coordinator: string;
   departmentId: number;
@@ -34,7 +39,9 @@ export default function UserMetaCard({
   id,
   name,
   designation,
+  sex,
   placeOfBirth,
+  profileImageUrl,
   department,
   coordinator,
   departmentId,
@@ -67,6 +74,8 @@ export default function UserMetaCard({
 
   const findDepartments = useDepartmentStore((state) => state.findDepartments);
 
+  const uploadImage = useUploadStore((state) => state.uploadImage);
+
   useEffect(() => {
     if (findUserDepartments && Array.isArray(findUserDepartments)) {
       const formatted = [
@@ -95,6 +104,54 @@ export default function UserMetaCard({
       setDepartmentOptions(formatted);
     }
   }, [findDepartments]);
+
+  // image upload
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+
+  const triggerInput = () => {
+    inputRef.current?.click();
+  };
+
+  const onSelectFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const imageDataUrl = await readFile(file);
+      setImageSrc(imageDataUrl);
+      setIsCropModalOpen(true);
+    }
+  };
+
+  const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
+    setCroppedAreaPixels(croppedPixels);
+  }, []);
+
+  const handleCropSave = async () => {
+    try {
+      if (!croppedAreaPixels || !imageSrc) return;
+
+      // Step 1: Crop the image & convert to Blob
+      const blobUrl = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const blob = await fetch(blobUrl).then((res) => res.blob());
+
+      // Step 2: Create File from Blob
+      const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
+
+      // Step 3: Upload via your store
+      await uploadImage(id, file);
+
+      setCroppedImage(blobUrl);
+      setIsCropModalOpen(false);
+    } catch (e) {
+      console.error("Error cropping/uploading image:", e);
+    }
+  };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -133,9 +190,36 @@ export default function UserMetaCard({
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
-            <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
-              <img src="/images/user/owner.jpg" alt="user" />
+            <div className="flex flex-col items-center space-y-4">
+              <div
+                onClick={triggerInput}
+                className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800 cursor-pointer"
+              >
+                <img
+                  src={
+                    profileImageUrl
+                      ? profileImageUrl
+                      : croppedImage
+                      ? croppedImage
+                      : sex == "male"
+                      ? "../../../../public/maleEmployee.png"
+                      : sex == "female"
+                      ? "../../../../public/femaleEmployee.png"
+                      : ""
+                  }
+                  alt="Profile"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                onChange={onSelectFile}
+                className="hidden"
+              />
             </div>
+
             <div className="order-3 xl:order-2">
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
                 {name}
@@ -449,6 +533,43 @@ export default function UserMetaCard({
           </form>
         </div>
       </Modal>
+
+      {/* croper modal */}
+      <Modal
+        isOpen={isCropModalOpen}
+        onClose={() => setIsCropModalOpen(false)}
+        className="max-w-2xl p-6"
+      >
+        <div className="relative h-[400px] bg-gray-100">
+          <Cropper
+            image={imageSrc!}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            onCropChange={setCrop}
+            onCropComplete={onCropComplete}
+            onZoomChange={setZoom}
+          />
+        </div>
+        <div className="mt-4 flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setIsCropModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleCropSave}>Crop & Save</Button>
+        </div>
+      </Modal>
     </>
   );
+}
+
+function readFile(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.addEventListener(
+      "load",
+      () => resolve(reader.result as string),
+      false
+    );
+    reader.readAsDataURL(file);
+  });
 }

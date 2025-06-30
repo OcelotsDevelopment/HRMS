@@ -81,33 +81,60 @@ const updateDailyAttendance = async (
 
 // 1. Biometric Push
 export const pushBiometricAttendanceService = async (data) => {
-  const { employeeId, timestamp, punchType, deviceId } = data;
+  const { UserID, Time, sn } = data;
 
-  const employee = await prisma.employee.findUnique({
-    where: { id: employeeId },
+  // 1. Map biometric UserID to employeeId
+  const employee = await prisma.employee.findFirst({
+    where: { employeeUniqueId: String(UserID) }, // Assuming you've stored this mapping
   });
 
-  if (!employee) throw new Error("Employee not found");
+  if (!employee) throw new Error(`No employee found for UserID ${UserID}`);
 
+  const employeeId = employee.id;
+  const timestamp = new Date(Time);
+
+  // 2. Find latest log for the day
+  const startOfDay = new Date(timestamp);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const latestLog = await prisma.attendanceLog.findFirst({
+    where: {
+      employeeId,
+      timestamp: {
+        gte: startOfDay,
+        lte: timestamp,
+      },
+    },
+    orderBy: {
+      timestamp: "desc",
+    },
+  });
+
+  // 3. Determine punchType
+  const punchType = latestLog?.punchType === "IN" ? "OUT" : "IN";
+
+  // 4. Save attendance log
   const log = await prisma.attendanceLog.create({
     data: {
       employeeId,
-      timestamp: new Date(timestamp),
+      timestamp,
       punchType,
-      deviceId,
+      deviceId: sn,
       source: "BIOMETRIC",
     },
   });
 
+  // 5. Update daily attendance summary
   const summary = await updateDailyAttendance(
     employeeId,
-    new Date(timestamp),
+    timestamp,
     punchType,
     "BIOMETRIC"
   );
 
   return { log, summary };
 };
+
 
 // 2. Manual Attendance Entry
 export const manualAttendanceEntryService = async (data) => {

@@ -6,8 +6,8 @@ import { Modal } from "../../../../ui/modal";
 import { useWorkforceStore } from "../../../../../store/workforceStore";
 
 import LeaveTableEach from "./LeaveTableEach";
-import AddLeaveEachForm from "../../../../../pages/workforce/leave/AddEachEmployee";
-import EditLeaveEachForm from "../../../../../pages/workforce/leave/EditLeaveEachForm";
+import AddLeaveEachForm from "./AddEachEmployee";
+import EditLeaveEachForm from "./EditLeaveEachForm";
 
 export default function LeaveInfo() {
   const [open, setOpen] = useState(false);

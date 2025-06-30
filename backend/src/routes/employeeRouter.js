@@ -16,7 +16,7 @@ import {
   updateQualification,
 
   // Payroll
-   createPayroll,
+  createPayroll,
   getPayrollById,
   getPayrollsByEmployee,
   updatePayroll,
@@ -28,10 +28,13 @@ import {
   deleteBankDetail,
   getBankDetailsByEmployee,
   getBankDetailById,
+  getAllPayrollsController,
+  uploadEmployeeImageController,
 } from "../controller/employeeController.js";
 
 import { verifyToken } from "../middlewares/tokenVerification.js";
 import { checkRole } from "../middlewares/checkRole.js";
+import upload from "../utils/multer.js";
 
 const router = express.Router();
 
@@ -45,6 +48,14 @@ router.post("/employment", addEmployment); // Add
 router.get("/employments/:id", listEmployment); // List by employee ID
 router.get("/employment/:id", getEmploymentById); // Get one
 router.put("/employment/:employmentId", updateEmployment); // Update
+// Upload employee image route
+router.post(
+  "/:id/upload-image",
+  verifyToken,
+  checkRole(["admin", "HR"]),
+  upload.single("image"), // uses memory storage
+  uploadEmployeeImageController
+);
 router.delete("/employment/:employmentId", deleteEmployment); // Delete
 
 // Qualification routes
@@ -54,24 +65,32 @@ router.get("/qualifications/:id", listQualification); // List by employee ID
 router.get("/qualification/:id", getQualificationById); // Get one
 router.put("/qualification/:qualificationId", updateQualification); // Update
 
-
 //Payroll
 router.post("/payroll", createPayroll);
+router.get("/allpayroll/:page/:limit", getAllPayrollsController);
 router.get("/payroll/:id", getPayrollById);
 router.get("/payrolls/:employeeId", getPayrollsByEmployee);
 router.put("/payroll/:id", updatePayroll);
 router.delete("/payroll/:id", deletePayroll);
 
-
 // Bank Details
 // Bank Details Routes
 router.post("/bank", verifyToken, checkRole(["admin", "HR"]), createBankDetail);
-router.put("/bank/:id", verifyToken, checkRole(["admin", "HR"]), updateBankDetail);
-router.delete("/bank/:id", verifyToken, checkRole(["admin", "HR"]), deleteBankDetail);
+router.put(
+  "/bank/:id",
+  verifyToken,
+  checkRole(["admin", "HR"]),
+  updateBankDetail
+);
+router.delete(
+  "/bank/:id",
+  verifyToken,
+  checkRole(["admin", "HR"]),
+  deleteBankDetail
+);
 
 // Any authenticated user can view bank details of employees
 router.get("/bank/employee/:employeeId", verifyToken, getBankDetailsByEmployee);
 router.get("/bank/:id", verifyToken, getBankDetailById);
-
 
 export default router;

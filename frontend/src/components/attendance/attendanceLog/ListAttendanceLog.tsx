@@ -46,11 +46,19 @@ export default function ListAttendanceLog() {
         </ComponentCard>
       </div>
 
-      <Modal isOpen={open} onClose={() => setOpen(false)} className="max-w-[600px] m-4">
+      <Modal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        className="max-w-[600px] m-4"
+      >
         <AddManualAttendanceForm />
       </Modal>
 
-      <Modal isOpen={openEdit} onClose={() => setOpenEdit(false)} className="max-w-[600px] m-4">
+      <Modal
+        isOpen={openEdit}
+        onClose={() => setOpenEdit(false)}
+        className="max-w-[600px] m-4"
+      >
         {logId && <EditAttendanceLogForm id={logId} />}
       </Modal>
     </>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Checkbox from "../../../components/form/input/Checkbox.tsx";
@@ -186,12 +186,12 @@ export default function SignInForm() {
                       Keep me logged in
                     </span>
                   </div>
-                  <Link
+                  {/* <Link
                     to="/reset-password"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     Forgot password?
-                  </Link>
+                  </Link> */}
                 </div>
 
                 <div>

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useModal } from "../../../hooks/useModal";
-import { useEmployeeStore } from "../../../store/employeeStore";
-import { useWorkforceStore } from "../../../store/workforceStore";
-import ComponentCard from "../../../components/common/ComponentCard";
-import Label from "../../../components/form/Label";
-import Input from "../../../components/input/InputField";
-import TextArea from "../../../components/input/TextArea";
-import Button from "../../../components/ui/button/Button";
+import { useModal } from "../../../../../hooks/useModal";
+import { useEmployeeStore } from "../../../../../store/employeeStore";
+import { useWorkforceStore } from "../../../../../store/workforceStore";
+import ComponentCard from "../../../../common/ComponentCard";
+import Label from "../../../../form/Label";
+import Input from "../../../../input/InputField";
+import TextArea from "../../../../input/TextArea";
+import Button from "../../../../ui/button/Button";
 
 interface EditLeaveFormProps {
   leaveId: number;

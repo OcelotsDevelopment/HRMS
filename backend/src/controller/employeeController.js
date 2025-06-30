@@ -16,12 +16,14 @@ import {
   listQualificationService,
   getQualificationByIdService,
   updateQualificationService,
+
+  // Payroll
   createPayrollService,
+  getAllPayrollsService,
   getPayrollByIdService,
   getPayrollsByEmployeeService,
   updatePayrollService,
   deletePayrollService,
-  // Payroll
 
   // Bank details
   createBankDetailService,
@@ -29,6 +31,7 @@ import {
   deleteBankDetailService,
   getBankDetailsByEmployeeService,
   getBankDetailByIdService,
+  uploadEmployeeImageService,
 } from "../services/employee.service.js";
 
 // @desc    Create new employee
@@ -86,9 +89,6 @@ export const getEmploymentById = asyncHandler(async (req, res) => {
 // @route   PUT /api/employee/employment/:employmentId
 export const updateEmployment = asyncHandler(async (req, res) => {
   const employmentId = Number(req.params.employmentId);
-
-  console.log(typeof employmentId, "empIdempIdempIdempIdempIdempIdempId");
-
   if (isNaN(employmentId)) {
     res.status(400).json({ message: "Invalid employment ID" });
     return;
@@ -97,6 +97,35 @@ export const updateEmployment = asyncHandler(async (req, res) => {
   const result = await updateEmploymentService(employmentId, req.body);
   res.status(200).json(result);
 });
+
+// @desc    Update employment
+// @route   PUT /api/employee/uploadProfile
+export const uploadEmployeeImageController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Image file is required." });
+    }
+
+    const imageUrl = await uploadEmployeeImageService(
+      id,
+      req.file.path,
+      req.file.originalname
+    );
+
+    res.json({
+      success: true,
+      message: "Image uploaded and saved successfully",
+      imageUrl,
+    });
+  } catch (error) {
+    console.error("Image Upload Error:", error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // @desc    Delete employment
 // @route   DELETE /api/employee/employment/:employmentId
@@ -144,6 +173,34 @@ export const createPayroll = asyncHandler(async (req, res) => {
   const result = await createPayrollService(req.body);
   res.status(201).json(result);
 });
+
+// @desc    Fetch single employment by ID
+// @route   GET /api/employee/allpayroll
+// Get All Payrolls (Paginated)
+export const getAllPayrollsController = async (req, res) => {
+  try {
+    console.log("============================================");
+
+    // Support both query (?page=1&limit=10) and path (/payrollAll/1/10)
+    const page = parseInt(req.query.page || req.params.page || "1", 10);
+    const limit = parseInt(req.query.limit || req.params.limit || "10", 10);
+
+    const data = await getAllPayrollsService(page, limit);
+
+    res.json({
+      success: true,
+      message: "Payrolls fetched successfully",
+      payrolls: data.payrolls,
+      pagination: data.pagination,
+    });
+  } catch (error) {
+    console.error("GetAllPayrolls Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong",
+    });
+  }
+};
 
 // @desc    Fetch single employment by ID
 // @route   GET /api/employee/payrollById/:id
@@ -203,8 +260,6 @@ export const getBankDetailsByEmployee = asyncHandler(async (req, res) => {
     Number(req.params.employeeId)
   );
 
-  console.log(result,"resultresultresultresultresultresultresult");
-  
   res.status(200).json(result);
 });
 

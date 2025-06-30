@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { api } from "../services/api";
 import axios from "axios";
+import type { Pagination } from "../types/paginationType";
 
 // bank details
 export interface BankDetail {
@@ -85,6 +86,7 @@ type Payroll = {
   paymentDate?: string; // ISO format string
   isPaid?: boolean;
   remarks?: string;
+  employee?: Employee;
 };
 type Employee = {
   id: number;
@@ -97,6 +99,7 @@ type Employee = {
   dob?: string;
   age?: number;
   placeOfBirth?: string;
+  profileImageUrl: string;
   height?: number;
   weight?: number;
   bloodGroup?: string;
@@ -171,9 +174,12 @@ type EmployeeState = {
   payrolls: Payroll[];
   selectedPayroll: Payroll | null;
   bankDetails: BankDetail[];
+  allPayrolls: Payroll[];
+  payrollPagination: Pagination;
   fetchPayrolls: (employeeId: number) => Promise<void>;
   getPayrollById: (id: number) => Promise<void>;
   addPayroll: (data: Payroll) => Promise<void>;
+  fetchAllPayrolls: (page?: number, limit?: number) => Promise<void>;
   updatePayroll: (id: number, data: Payroll) => Promise<void>;
   deletePayroll: (id: number) => Promise<void>;
 
@@ -200,6 +206,13 @@ export const useEmployeeStore = create<EmployeeState>()(
       payrolls: [],
       selectedPayroll: null,
       bankDetails: [],
+      allPayrolls: [],
+      payrollPagination: {
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      },
 
       loading: false,
       error: null,
@@ -467,6 +480,32 @@ export const useEmployeeStore = create<EmployeeState>()(
         }
       },
 
+      fetchAllPayrolls: async (page = 1, limit = 10) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+
+          const response = await api.get(
+            `/employee/allpayroll/${page}/${limit}`,
+            {
+              // params: { page, limit },
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const { payrolls, pagination } = response.data;
+
+          set({
+            allPayrolls: payrolls,
+            payrollPagination: pagination,
+            loading: false,
+          });
+        } catch (err) {
+          console.log(err, "Error fetching all payrolls");
+          handleError(err, set);
+        }
+      },
+
       updatePayroll: async (id, data) => {
         set({ loading: true, error: null });
         try {
@@ -542,7 +581,6 @@ export const useEmployeeStore = create<EmployeeState>()(
             headers: { Authorization: `Bearer ${token}` },
           });
 
-         
           set({ bankDetails: res.data, loading: false });
         } catch (err) {
           handleError(err, set);

@@ -39,14 +39,21 @@ export const createUserService = async ({ name, email, departmentId }) => {
 
 // List Users
 export const listUsersService = async () => {
-  return await prisma.user.findMany({
+  const users = await prisma.user.findMany({
+    where: {
+      NOT: {
+        role: { in: ["admin", "superAdmin"] },
+      },
+    },
     include: {
-      headOf: true, // includes department if user is a department head
+      headOf: true, 
     },
     orderBy: {
-      createdAt: "desc", // sort by 'createdAt' in ascending order
+      createdAt: "desc",
     },
   });
+
+  return users;
 };
 
 // Find By Id
@@ -54,7 +61,7 @@ export const findUserByIdService = async (id) => {
   const user = await prisma.user.findUnique({
     where: { id: Number(id) },
     include: {
-      headOf: true, // Include department info if applicable
+      headOf: true, 
     },
   });
 

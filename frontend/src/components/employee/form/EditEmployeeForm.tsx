@@ -121,12 +121,12 @@ export default function EditEmployeeForm({ employee }: Props) {
       newErrors.email = "Invalid email format.";
     if (!form.mobile.trim()) newErrors.mobile = "Mobile is required.";
     if (!form.dob) newErrors.dob = "Date of birth is required.";
+    if (!form.dateOfJoining)
+      newErrors.dateOfJoining = "Date of joining is required.";
     if (!form.departmentId || form.departmentId <= 0)
       newErrors.departmentId = "Department is required.";
     if (!form.coordinatorId || form.coordinatorId <= 0) {
       newErrors.coordinatorId = "User is required.";
-      if (!form.dateOfJoining)
-        newErrors.dateOfJoining = "Date of joining is required.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

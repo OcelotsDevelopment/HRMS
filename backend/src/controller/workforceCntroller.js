@@ -117,8 +117,12 @@ export const createLeaveController = async (req, res) => {
 // Get All Leaves
 export const getAllLeavesController = async (req, res) => {
   try {
-    const leaves = await getAllLeavesService();
-    res.status(200).json({ success: true, leaves });
+    const page = parseInt(req.query.page || "1");
+    const status = req.query.status || "";
+
+    const { leaves, totalPages } = await getAllLeavesService(page, status);
+
+    res.status(200).json({ success: true, leaves, totalPages });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -152,7 +156,6 @@ export const getLeavesByEmployee = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 // Update Leave
 export const updateLeaveController = async (req, res) => {

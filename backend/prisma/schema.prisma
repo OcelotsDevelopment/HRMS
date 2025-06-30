@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   userUniqueId String? @unique
-  name     String
-  email    String @unique
-  password String
-  role     String
+  name         String
+  email        String  @unique
+  password     String
+  role         String
 
   departmentId        Int? // ✅ must exist
   department          Department? @relation("DepartmentUsers", fields: [departmentId], references: [id])
@@ -40,7 +40,7 @@ model Department {
 
 model Employee {
   id               Int       @id @default(autoincrement())
-  employeeUniqueId String? @unique
+  employeeUniqueId String?   @unique
   name             String
   email            String    @unique
   mobile           String?
@@ -82,7 +82,7 @@ model Employee {
   leavesAppliedByEmployee Leave[]         @relation("AppliedLeaves")
 
   // bank details
-  BankDetails BankDetail[] 
+  BankDetails BankDetail[]
 
   // Legal/Personal Info
   liabilitiesDetails    String?
@@ -103,6 +103,7 @@ model Employee {
   isRehire        Boolean?          @default(false)
   AttendanceLog   AttendanceLog[]
   DailyAttendance DailyAttendance[]
+  CompOff         CompOff[]
 }
 
 model Qualification {
@@ -130,7 +131,7 @@ model Employment {
 }
 
 model BankDetail {
-  id            Int       @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   bankName      String
   accountNumber String
   ifscCode      String
@@ -138,12 +139,10 @@ model BankDetail {
   accountType   String?
   upiId         String?
   employeeId    Int
-  employee      Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
-
-
 
 model Reference {
   id           Int      @id @default(autoincrement())
@@ -229,24 +228,24 @@ model HolidayType {
 
 // leave
 model Leave {
-  id                  Int       @id @default(autoincrement())
+  id                  Int         @id @default(autoincrement())
   title               String
   description         String?
   from                DateTime
   to                  DateTime
   type                String
-  isPaid              Boolean   @default(true)
+  isPaid              Boolean     @default(true)
   employeeId          Int
-  employee            Employee  @relation("EmployeeLeaves", fields: [employeeId], references: [id])
+  employee            Employee    @relation("EmployeeLeaves", fields: [employeeId], references: [id])
   appliedByEmployeeId Int?
-  appliedByEmployee   Employee? @relation("AppliedLeaves", fields: [appliedByEmployeeId], references: [id])
+  appliedByEmployee   Employee?   @relation("AppliedLeaves", fields: [appliedByEmployeeId], references: [id])
   appliedByUserId     Int?
-  appliedByUser       User?     @relation("UserAppliedLeaves", fields: [appliedByUserId], references: [id])
+  appliedByUser       User?       @relation("UserAppliedLeaves", fields: [appliedByUserId], references: [id])
   status              LeaveStatus @default(PENDING)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  CompOff             CompOff[]
 }
-
 
 enum LeaveType {
   SICK
@@ -259,6 +258,33 @@ enum LeaveStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+// CompOff
+model CompOff {
+  id          Int           @id @default(autoincrement())
+  employeeId  Int
+  employee    Employee      @relation(fields: [employeeId], references: [id])
+  workedFrom  DateTime
+  workedTo    DateTime
+  reason      String?
+  daysGranted Int
+  hoursEarned Float?
+  status      CompOffStatus @default(PENDING)
+  appliedOn   DateTime      @default(now())
+  usedFrom    DateTime?
+  usedTo      DateTime?
+  leaveId     Int?
+  leave       Leave?        @relation(fields: [leaveId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum CompOffStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  USED
 }
 
 // Event
@@ -289,22 +315,21 @@ model AttendanceLog {
   employee Employee @relation(fields: [employeeId], references: [id])
 
   @@unique([employeeId, timestamp])
-
 }
 
 model DailyAttendance {
-  id          String   @id @default(cuid())
-  employeeId  Int
-  employee    Employee @relation(fields: [employeeId], references: [id])
-  date        DateTime
-  checkIn     DateTime?
-  checkOut    DateTime?
-  totalHours  Float?
-  otHours     Float?
-  status      String
-  source      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String    @id @default(cuid())
+  employeeId Int
+  employee   Employee  @relation(fields: [employeeId], references: [id])
+  date       DateTime
+  checkIn    DateTime?
+  checkOut   DateTime?
+  totalHours Float?
+  otHours    Float?
+  status     String
+  source     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@unique([employeeId, date], name: "employee_date_unique")
 }

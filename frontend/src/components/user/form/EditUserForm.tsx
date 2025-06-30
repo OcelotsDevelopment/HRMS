@@ -56,10 +56,13 @@ export default function EditUserForm({ user }: EditUserFormProps) {
 
   useEffect(() => {
     if (findDepartments && Array.isArray(findDepartments)) {
-      const formatted: Department[] = findDepartments.map((department) => ({
-        value: department.id,
-        label: department.name,
-      }));
+      const formatted: Department[] = [
+        { value: 0, label: "Select a user" },
+        ...findDepartments.map((department) => ({
+          value: department.id,
+          label: department.name,
+        })),
+      ];
       setDepartmentOptions(formatted);
     }
   }, [findDepartments]);
@@ -125,7 +128,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
 
           <Select
             options={departmentOptions}
-            placeholder="Select an option"
+            // placeholder="Select an option"
             onChange={(e) => setDepartmentId(Number(e))}
             className="dark:bg-dark-900"
             value={departmentId} // ✅ pass controlled value here

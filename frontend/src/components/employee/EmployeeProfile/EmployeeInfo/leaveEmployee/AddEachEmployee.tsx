@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { useModal } from "../../../hooks/useModal";
-import { useEmployeeStore } from "../../../store/employeeStore";
-import { useWorkforceStore } from "../../../store/workforceStore";
-import ComponentCard from "../../../components/common/ComponentCard";
-import Label from "../../../components/form/Label";
-import Input from "../../../components/input/InputField";
-import TextArea from "../../../components/input/TextArea";
-import Button from "../../../components/ui/button/Button";
+import { useModal } from "../../../../../hooks/useModal";
+import { useEmployeeStore } from "../../../../../store/employeeStore";
+import { useWorkforceStore } from "../../../../../store/workforceStore";
+import ComponentCard from "../../../../common/ComponentCard";
+import Label from "../../../../form/Label";
+import Input from "../../../../input/InputField";
+import TextArea from "../../../../input/TextArea";
+import Button from "../../../../ui/button/Button";
 
 export default function AddLeaveEachForm() {
   const { closeModal } = useModal();
-  const { addLeave, error } = useWorkforceStore();
+  const { addLeave, error,leaves } = useWorkforceStore();
   const { selectedEmployee } = useEmployeeStore();
 
   const [form, setForm] = useState({
@@ -32,6 +32,12 @@ export default function AddLeaveEachForm() {
       setForm((prev) => ({ ...prev, employeeId: selectedEmployee.id }));
     }
   }, [selectedEmployee]);
+
+  useEffect(()=>{
+    if(leaves){
+      closeModal()
+    }
+  },[leaves,closeModal])
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -169,9 +175,9 @@ export default function AddLeaveEachForm() {
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <Button size="sm" variant="outline" onClick={closeModal}>
+          {/* <Button size="sm" variant="outline" onClick={closeModal}>
             Cancel
-          </Button>
+          </Button> */}
           <Button size="sm">Apply Leave</Button>
         </div>
       </form>

@@ -112,7 +112,7 @@ interface LeaveBalance {
   totalAccrued: number;
   totalUsed: number;
   remaining: number;
-  remainingThisMonth:number;
+  remainingThisMonth: number;
 }
 
 type WorkspaceState = {
@@ -121,7 +121,7 @@ type WorkspaceState = {
   addSuccessHoliday: Holiday | null;
   loading: boolean;
   error: string | null;
-
+  totalPages: number;
   fetchHolidays: () => Promise<void>;
   getHolidayById: (id: number) => Promise<void>;
   addHoliday: (data: Partial<Holiday>) => Promise<void>;
@@ -132,8 +132,8 @@ type WorkspaceState = {
   leaves: Leave[];
   selectedLeave: Leave | null;
   leavesEach: Leave[];
-leaveBalanceEach: LeaveBalance | null;
-  fetchLeaves: () => Promise<void>;
+  leaveBalanceEach: LeaveBalance | null;
+  fetchLeaves: (page?: number, status?: string) => Promise<void>;
   fetchLeavesEach: (id: number) => Promise<void>;
   getLeaveById: (id: number) => Promise<void>;
   addLeave: (data: Partial<Leave>) => Promise<void>;
@@ -164,7 +164,8 @@ export const useWorkforceStore = create<WorkspaceState>()(
       leaves: [],
       selectedLeave: null,
       leavesEach: [],
-      leaveBalanceEach:null,
+      leaveBalanceEach: null,
+      totalPages: 1,
 
       // events
       events: [],
@@ -242,14 +243,21 @@ export const useWorkforceStore = create<WorkspaceState>()(
 
       // Leave
 
-      fetchLeaves: async () => {
+      fetchLeaves: async (page = 1, status = "") => {
         set({ loading: true, error: null });
         try {
           const token = localStorage.getItem("auth_token");
-          const res = await api.get("/workforce/leave", {
-            headers: { Authorization: `Bearer ${token}` },
+          const res = await api.get(
+            `/workforce/leave?page=${page}&status=${status}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          set({
+            leaves: res.data.leaves ?? [],
+            totalPages: res.data.totalPages,
+            loading: false,
           });
-          set({ leaves: res.data.leaves ?? [], loading: false });
         } catch (err) {
           handleError(err, set);
         }
@@ -269,11 +277,11 @@ export const useWorkforceStore = create<WorkspaceState>()(
       },
 
       fetchLeavesEach: async (id) => {
-        const res = await api.get(`/workforce/leave/leave-by-employee/${id}`); 
+        const res = await api.get(`/workforce/leave/leave-by-employee/${id}`);
         set({
-    leavesEach: res.data.leaves,
-    leaveBalanceEach: res.data.leaveBalance,
-  });
+          leavesEach: res.data.leaves,
+          leaveBalanceEach: res.data.leaveBalance,
+        });
       },
       addLeave: async (data: Partial<Leave>) => {
         try {

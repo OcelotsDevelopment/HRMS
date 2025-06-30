@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth/", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/admin", adminRouter);
-app.use("/api/employee/", employeeRouter);
+app.use("/api/employee", employeeRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/setting", settingRouter);

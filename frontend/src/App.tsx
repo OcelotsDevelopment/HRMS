@@ -11,8 +11,9 @@ import EmployeeProfiles from "./pages/employee/EmployeeDetails/EmployeeProfile";
 import Calendar from "./pages/Calendar";
 import Setting from "./pages/setting/Setting";
 import ListHoliday from "./pages/workforce/holiday/ListHoliday";
-import ListLeave from "./pages/workforce/leave/ListLeave";
 import Attendance from "./pages/attendance/Attendance";
+import ViewPayrollPage from "./pages/payroll/ViewPayrollPage";
+import MainLeave from "./pages/workforce/leave/MainLeave";
 
 function App() {
   return (
@@ -34,12 +35,15 @@ function App() {
             {/* workforce */}
             <Route path="/workforce/holiday" element={<ListHoliday />} />
 
-            <Route path="/workforce/leave" element={<ListLeave />} />
+            <Route path="/workforce/leave" element={<MainLeave />} />
 
             <Route path="/workforce/events" element={<Calendar />} />
 
             {/* Attendance */}
             <Route path="/attendance" element={<Attendance />} />
+
+            {/* Payroll */}
+            <Route path="/payroll" element={<ViewPayrollPage />} />
 
             {/* SETTINGS */}
             <Route path="/settings" element={<Setting />} />

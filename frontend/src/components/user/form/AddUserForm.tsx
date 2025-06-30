@@ -110,7 +110,7 @@ export default function AddUserForm() {
 
           <Select
             options={departmentOptions}
-            placeholder="Select an option"
+            // placeholder="Select an option"
             onChange={(e) => setDepartmentId(Number(e))}
             className="dark:bg-dark-900"
             value={departmentId}
