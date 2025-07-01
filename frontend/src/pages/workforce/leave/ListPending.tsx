@@ -10,24 +10,23 @@ import AddLeaveForm from "../../../components/workforce/leave/AddLeaveForm";
 import EditLeaveForm from "../../../components/workforce/leave/EditLeaveForm";
 import PaginationControls from "../../../components/ui/pagination/PaginationControls";
 
-export default function ListLeave() {
+export default function ListPendingLeave() {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [leaveId, setLeaveId] = useState<number>();
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
 
-  const { leaves, fetchLeaves, fetchPendingLeaves, totalPages } =
-    useWorkforceStore();
+  const { pendingLeaves, fetchPendingLeaves, totalPages } = useWorkforceStore();
 
   useEffect(() => {
-    fetchLeaves(currentPage, statusFilter);
-  }, [currentPage, statusFilter, fetchLeaves, fetchPendingLeaves]);
+    fetchPendingLeaves(currentPage, "PENDING");
+  }, [currentPage, statusFilter, fetchPendingLeaves]);
 
   useEffect(() => {
     setOpen(false);
     setOpenEdit(false);
-  }, [leaves]);
+  }, [pendingLeaves]);
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatusFilter(e.target.value);
@@ -65,8 +64,9 @@ export default function ListLeave() {
               setOpenEdit(true);
             }}
           /> */}
+
           <LeaveTable
-            leaves={leaves}
+            leaves={pendingLeaves}
             openModal={(id) => {
               setLeaveId(id);
               setOpenEdit(true);

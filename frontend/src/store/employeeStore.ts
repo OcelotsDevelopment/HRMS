@@ -224,7 +224,6 @@ export const useEmployeeStore = create<EmployeeState>()(
           const res = await api.get("/employee", {
             headers: { Authorization: `Bearer ${token}` },
           });
-          console.log(res.data, "jksdhfksdhfkasdhfkjsdhfkdjh");
 
           set({ employees: res.data.employees, loading: false });
         } catch (err) {

@@ -1,7 +1,7 @@
 import { useEffect, useState, type JSX } from "react";
 import DataTable from "../../common/DataTable";
-import { useWorkforceStore } from "../../../store/workforceStore";
 import Badge from "../../ui/badge/Badge";
+import type { Leave } from "../../../store/workforceStore";
 
 type LeaveRow = {
   id: number;
@@ -16,11 +16,11 @@ type LeaveRow = {
 };
 
 interface LeaveTableProps {
+  leaves: Leave[];
   openModal: (id: number) => void;
 }
 
-export default function LeaveTable({ openModal }: LeaveTableProps) {
-  const { leaves } = useWorkforceStore();
+export default function LeaveTable({ leaves, openModal }: LeaveTableProps) {
   const [tableData, setTableData] = useState<LeaveRow[]>([]);
 
   useEffect(() => {

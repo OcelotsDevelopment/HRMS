@@ -50,7 +50,7 @@ export const getAllUsersWithDepartmentService = async (id) => {
         name: true,
         email: true,
         role: true,
-        departmentId: true, // ✅ include only departmentId
+        departmentId: true, // : include only departmentId
         createdAt: true,
       },
       orderBy: {
@@ -76,7 +76,7 @@ export const getDepartmentByIdService = async (id) => {
           },
         },
         employees: true,
-        users: true, // ✅ fetch all users under this department
+        users: true, // : fetch all users under this department
       },
     });
 

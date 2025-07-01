@@ -28,7 +28,10 @@ export default function ListEmployee() {
 
   return (
     <>
-      <PageMeta title="Employee Management" description="List of company employees" />
+      <PageMeta
+        title="Employee Management"
+        description="List of company employees"
+      />
       <PageBreadcrumb pageTitle="Employee Table" />
       <div className="space-y-6">
         <ComponentCard
@@ -58,7 +61,9 @@ export default function ListEmployee() {
         onClose={() => setOpenEdit(false)}
         className="max-w-[700px] m-4"
       >
-        {employeeId !== undefined && <EditEmployeeForm employee={{ id: employeeId }} />}
+        {employeeId !== undefined && (
+          <EditEmployeeForm employee={{ id: employeeId }} />
+        )}
       </Modal>
     </>
   );

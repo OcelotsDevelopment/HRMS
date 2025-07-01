@@ -1,5 +1,7 @@
 import { Tabs } from "../../../components/ui/tab/Tabs";
+import ListCompOff from "./ListCompOff";
 import ListLeave from "./ListLeave";
+import ListPendingLeave from "./ListPending";
 
 function MainLeave() {
   return (
@@ -15,12 +17,12 @@ function MainLeave() {
           {
             id: "tab2",
             label: "All Pending Leaves",
-            content: <div>tab 2</div>,
+            content: <ListPendingLeave />,
           },
           {
             id: "tab3",
-            label: "Payroll",
-            content: <div>Hello2</div>,
+            label: "Compensatory Off",
+            content: <ListCompOff/>,
           },
         ]}
       />

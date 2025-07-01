@@ -38,16 +38,26 @@ import upload from "../utils/multer.js";
 
 const router = express.Router();
 
-router.post("/", createEmployee);
+router.post("/", verifyToken, checkRole(["admin", "hr"]), createEmployee);
 router.get("/", getAllEmployees);
 router.get("/:id", getEmployeeById);
-router.put("/:id", updateEmployee);
+router.put("/:id", verifyToken, checkRole(["admin", "hr"]), updateEmployee);
 
 // Employment routes
-router.post("/employment", addEmployment); // Add
+router.post(
+  "/employment",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  addEmployment
+); // Add
 router.get("/employments/:id", listEmployment); // List by employee ID
 router.get("/employment/:id", getEmploymentById); // Get one
-router.put("/employment/:employmentId", updateEmployment); // Update
+router.put(
+  "/employment/:employmentId",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  updateEmployment
+); // Update
 // Upload employee image route
 router.post(
   "/:id/upload-image",
@@ -60,18 +70,38 @@ router.delete("/employment/:employmentId", deleteEmployment); // Delete
 
 // Qualification routes
 // Qualification routes
-router.post("/qualification", addQualification); // Add qualification
+router.post(
+  "/qualification",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  addQualification
+); // Add qualification
 router.get("/qualifications/:id", listQualification); // List by employee ID
 router.get("/qualification/:id", getQualificationById); // Get one
-router.put("/qualification/:qualificationId", updateQualification); // Update
+router.put(
+  "/qualification/:qualificationId",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  updateQualification
+); // Update
 
 //Payroll
-router.post("/payroll", createPayroll);
+router.post("/payroll", verifyToken, checkRole(["admin", "hr"]), createPayroll);
 router.get("/allpayroll/:page/:limit", getAllPayrollsController);
 router.get("/payroll/:id", getPayrollById);
 router.get("/payrolls/:employeeId", getPayrollsByEmployee);
-router.put("/payroll/:id", updatePayroll);
-router.delete("/payroll/:id", deletePayroll);
+router.put(
+  "/payroll/:id",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  updatePayroll
+);
+router.delete(
+  "/payroll/:id",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  deletePayroll
+);
 
 // Bank Details
 // Bank Details Routes

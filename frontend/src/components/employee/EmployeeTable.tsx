@@ -44,10 +44,10 @@ export default function EmployeeTable({ openModal }: EmployeeTableProps) {
         ? employee?.coordinator?.name
         : "-",
       action: (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center">
           <button
             onClick={() => openModal(employee.id)}
-            className="px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 "
+            className="px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 "
           >
             <svg
               width="24"
@@ -69,7 +69,7 @@ export default function EmployeeTable({ openModal }: EmployeeTableProps) {
 
           <button
             onClick={() => navigate(`add-details/${employee.id}`)}
-            className="px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 "
+            className="px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 "
           >
             <svg
               width="24"
@@ -167,7 +167,7 @@ export default function EmployeeTable({ openModal }: EmployeeTableProps) {
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {employee.coordinatore}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                <TableCell className="text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {employee.action}
                 </TableCell>
               </TableRow>

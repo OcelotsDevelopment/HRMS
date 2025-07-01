@@ -132,6 +132,39 @@ export const getAllLeavesService = async (page = 1, status = "") => {
   }
 };
 
+// pending leave get all
+export const getAllPendingLeavesService = async (page = 1, status = "") => {
+  try {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const where = status ? { status } : {}; // Apply status filter if provided
+    console.log(status, "staustsalsaoijusoiusoijsjt");
+
+    const [leaves, totalCount] = await Promise.all([
+      prisma.leave.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { from: "desc" },
+        include: {
+          employee: true,
+          appliedByEmployee: true,
+          appliedByUser: true,
+        },
+      }),
+      prisma.leave.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return { leaves, totalPages };
+  } catch (error) {
+    console.error("Get All Leaves Error:", error);
+    throw new Error("Failed to fetch leave records");
+  }
+};
+
 //  Get Leave By ID
 export const getLeaveByIdService = async (id) => {
   const leave = await prisma.leave.findUnique({
@@ -166,32 +199,63 @@ export const getLeavesByEmployeeId = async (employeeId) => {
     orderBy: { createdAt: "desc" },
   });
 
+  const compOffs = await prisma.compOff.findMany({
+    where: {
+      employeeId,
+      status: "APPROVED",
+    },
+  });
+
   const today = new Date();
   const joinDate = new Date(employee.dateOfJoining);
 
-  // Total months from join date to current date
   const monthsWorked =
     (today.getFullYear() - joinDate.getFullYear()) * 12 +
     (today.getMonth() - joinDate.getMonth()) +
     1;
 
-  const totalAccrued = monthsWorked * 1.5;
+  const baseAccrued = monthsWorked * 1.5;
 
-  // Calculate total used leaves across all months
-  const totalUsed = leaves.reduce((acc, leave) => {
+  //  Add compOff earned days to totalAccrued
+  const compOffDaysEarned = compOffs.reduce((acc, curr) => {
+    return acc + (curr.daysGranted || 0);
+  }, 0);
+
+  const totalAccrued = baseAccrued + compOffDaysEarned;
+
+  //  Calculate leave days used
+  const leaveDaysUsed = leaves.reduce((acc, leave) => {
+    if (leave.status !== "APPROVED") return acc;
+
     const from = new Date(leave.from);
     const to = new Date(leave.to);
     const days = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24) + 1;
+
     return acc + days;
   }, 0);
 
-  const remaining = totalAccrued - totalUsed;
-  console.log(remaining, "remainingremainingremainingremainingremaining");
+  //  Add compOff used days
+  const compOffDaysUsed = compOffs.reduce((acc, compOff) => {
+    if (compOff.usedFrom && compOff.usedTo) {
+      const from = new Date(compOff.usedFrom);
+      const to = new Date(compOff.usedTo);
+      const days = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24) + 1;
+      return acc + days;
+    }
+    return acc;
+  }, 0);
 
-  // Leaves used this current month
+  const totalUsed = leaveDaysUsed + compOffDaysUsed;
+
+  const remaining = totalAccrued - totalUsed;
+
+  //  Used this month (only for leave, not comp off)
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
+
   const usedThisMonth = leaves.reduce((acc, leave) => {
+    if (leave.status !== "APPROVED") return acc;
+
     const from = new Date(leave.from);
     const to = new Date(leave.to);
 
@@ -206,11 +270,12 @@ export const getLeavesByEmployeeId = async (employeeId) => {
     return acc;
   }, 0);
 
-  const availableThisMonth = 1.5; // per policy
+  const availableThisMonth = 1.5;
   const remainingThisMonth = Math.max(availableThisMonth - usedThisMonth, 0);
 
   return {
     leaves,
+    compOffs,
     leaveBalance: {
       totalAccrued: parseFloat(totalAccrued.toFixed(1)),
       totalUsed: parseFloat(totalUsed.toFixed(1)),
@@ -218,7 +283,7 @@ export const getLeavesByEmployeeId = async (employeeId) => {
 
       usedThisMonth: parseFloat(usedThisMonth.toFixed(1)),
       availableThisMonth: parseFloat(availableThisMonth.toFixed(1)),
-      remainingThisMonth: parseFloat(remaining.toFixed(1)),
+      remainingThisMonth: parseFloat(remainingThisMonth.toFixed(1)),
     },
   };
 };
@@ -332,4 +397,115 @@ export const updateEventService = async (id, data) => {
 export const deleteEventService = async (id) => {
   await prisma.event.delete({ where: { id } });
   return { message: "Event deleted successfully" };
+};
+
+// COMP OFF SERVICES
+
+// Create CompOff
+export const createCompOffService = async (data) => {
+  const { title, workedFrom, workedTo, reason, daysGranted, employeeId } = data;
+  console.log(data, "datadatadatadatadatadatadatadatadata");
+
+  if (!title?.trim()) throw new Error("Title is required");
+  if (!workedFrom || isNaN(new Date(workedFrom)))
+    throw new Error("Valid date is required");
+  if (!workedTo || isNaN(new Date(workedTo)))
+    throw new Error("Valid date is required");
+  if (!employeeId) throw new Error("Employee ID is required");
+
+  const from = new Date(workedFrom);
+  const to = new Date(workedTo);
+
+  if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+    throw new Error("Valid date is required");
+  }
+
+  //  Calculate hours earned
+  const diffMs = to.getTime() - from.getTime();
+  const hoursEarned = diffMs / (1000 * 60 * 60);
+
+  const compOff = await prisma.compOff.create({
+    data: {
+      title: title.trim(),
+      workedFrom: from,
+      workedTo: to,
+      employeeId: Number(employeeId),
+      reason: reason?.trim() || null,
+      daysGranted: daysGranted,
+      hoursEarned: parseFloat(hoursEarned.toFixed(2)),
+    },
+  });
+
+  return { compOff };
+};
+
+// Get All CompOffs
+export const getAllCompOffsService = async () => {
+  const compOffs = await prisma.compOff.findMany({
+    include: {
+      employee: true,
+    },
+    orderBy: {
+      appliedOn: "desc",
+    },
+  });
+
+  return compOffs;
+};
+
+// Get CompOff by ID
+export const getCompOffByIdService = async (id) => {
+  const compOff = await prisma.compOff.findUnique({
+    where: { id },
+    include: {
+      employee: true,
+    },
+  });
+
+  if (!compOff) throw new Error("CompOff not found");
+  return { compOff };
+};
+
+// Update CompOff
+// Update CompOff
+export const updateCompOffService = async (id, data) => {
+  const compOff = await prisma.compOff.findUnique({ where: { id } });
+  if (!compOff) throw new Error("CompOff not found");
+
+  const from = new Date(data.workedFrom);
+  const to = new Date(data.workedTo);
+  const hoursEarned = (to.getTime() - from.getTime()) / (1000 * 60 * 60);
+
+  const updated = await prisma.compOff.update({
+    where: { id },
+    data: {
+      title: data.title?.trim(),
+      workedFrom: from,
+      workedTo: to,
+      employeeId: Number(data.employeeId),
+      reason: data.reason?.trim() || null,
+      daysGranted: Number(data.daysGranted),
+      hoursEarned: parseFloat(hoursEarned.toFixed(2)),
+      status: data.status || "PENDING",
+      usedFrom: data.usedFrom ? new Date(data.usedFrom) : null,
+      usedTo: data.usedTo ? new Date(data.usedTo) : null,
+      leaveId: data.leaveId ? Number(data.leaveId) : null,
+    },
+  });
+
+  return { compOff: updated };
+};
+
+// Delete CompOff
+export const deleteCompOffService = async (id) => {
+  await prisma.compOff.delete({ where: { id } });
+  return { message: "CompOff deleted successfully" };
+};
+
+export const updateCompOffStatusService = async (id, status) => {
+  const compOff = await prisma.compOff.update({
+    where: { id },
+    data: { status },
+  });
+  return compOff;
 };

@@ -1,6 +1,6 @@
 import { prisma } from "../config/db.js";
 
-// ✅ Create Region
+// : Create Region
 export const createRegionService = async (data) => {
   try {
     const { name, description } = data;
@@ -24,7 +24,7 @@ export const createRegionService = async (data) => {
   }
 };
 
-// ✅ Get All Regions
+// : Get All Regions
 export const getAllRegionsService = async () => {
   try {
     const regions = await prisma.region.findMany({
@@ -37,7 +37,7 @@ export const getAllRegionsService = async () => {
   }
 };
 
-// ✅ Get Region by ID
+// : Get Region by ID
 export const getRegionByIdService = async (id) => {
   try {
     const region = await prisma.region.findUnique({ where: { id } });
@@ -49,7 +49,7 @@ export const getRegionByIdService = async (id) => {
   }
 };
 
-// ✅ Update Region
+// : Update Region
 export const updateRegionService = async (id, data) => {
   try {
     const region = await prisma.region.findUnique({ where: { id } });
@@ -67,7 +67,7 @@ export const updateRegionService = async (id, data) => {
   }
 };
 
-// ✅ Delete Region
+// : Delete Region
 export const deleteRegionService = async (id) => {
   try {
     await prisma.region.delete({ where: { id } });

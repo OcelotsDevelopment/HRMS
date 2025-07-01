@@ -18,11 +18,6 @@ function Setting() {
             label: "Holiday Type",
             content: <ListHolidayType />,
           },
-          {
-            id: "tab3",
-            label: "Payroll",
-            content: <div>Hello2</div>,
-          },
         ]}
       />
       {/* </div> */}

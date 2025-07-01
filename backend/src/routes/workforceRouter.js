@@ -19,7 +19,16 @@ import {
   updateEventController,
   deleteEventController,
   getLeavesByEmployee,
-} from "../controller/workforceCntroller.js";
+  getAllPendingLeavesController,
+
+   // CompOff
+  createCompOffController,
+  getAllCompOffsController,
+  getCompOffByIdController,
+  updateCompOffController,
+  deleteCompOffController,
+  updateCompOffStatusController,
+} from "../controller/workforceController.js";
 
 const router = Router();
 
@@ -34,6 +43,8 @@ router.delete("/holiday/:id", deleteHolidayController);
 
 // Leave Endpoints
 router.get("/leave", getAllLeavesController);
+router.get("/pendingLeave", getAllPendingLeavesController);
+
 router.get("/leave/:id", getLeaveByIdController);
 router.get("/leave/leave-by-employee/:id", getLeavesByEmployee);
 router.post("/leave", createLeaveController);
@@ -46,5 +57,13 @@ router.get("/event/:id", getEventByIdController);
 router.post("/event", createEventController);
 router.put("/event/:id", updateEventController);
 router.delete("/event/:id", deleteEventController);
+
+// CompOff Routes
+router.get("/compoff", getAllCompOffsController);
+router.get("/compoff/:id", getCompOffByIdController);
+router.post("/compoff", createCompOffController);
+router.put("/compoff/:id", updateCompOffController);
+router.delete("/compoff/:id", deleteCompOffController);
+router.patch("/compoff/:id", updateCompOffStatusController);
 
 export default router;

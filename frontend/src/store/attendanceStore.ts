@@ -152,7 +152,7 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
       const res = await api.get(`/attendance/daily/${employeeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      set({ daily: res.data.daily, loading: false });
+      set({ daily: res.data, loading: false });
     } catch (err) {
       handleError(err, set);
     }

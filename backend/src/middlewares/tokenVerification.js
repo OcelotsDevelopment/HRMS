@@ -22,7 +22,7 @@ export async function verifyToken(req, res, next) {
     }
 
     try {
-      // ✅ Fetch user from DB using ID from token
+      // : Fetch user from DB using ID from token
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
         select: { id: true, name: true, email: true, role: true },
@@ -32,7 +32,7 @@ export async function verifyToken(req, res, next) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      console.log("✅ User fetched from DB:", user);
+      console.log(": User fetched from DB:", user);
       req.user = user; // Attach full user info with role
       next();
     } catch (dbErr) {

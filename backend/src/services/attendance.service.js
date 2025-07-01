@@ -460,8 +460,7 @@ export const getDailyAttendanceByEmployeeIdService = async (employeeId) => {
     where: { employeeId },
     orderBy: { date: "desc" },
   });
-
-  return { summaries };
+  return summaries;
 };
 
 // GET /attendance/daily/id/:id

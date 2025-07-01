@@ -7,17 +7,28 @@ import {
   getAllAttendanceLogs,
   getAllDailyAttendanceController,
   getDailyAttendanceById,
-  updateManualAttendanceEntry
+  updateManualAttendanceEntry,
 } from "../controller/attendanceController.js";
+import { verifyToken } from "../middlewares/tokenVerification.js";
+import { checkRole } from "../middlewares/checkRole.js";
 
 const router = express.Router();
 
 router.post("/biometric", pushBiometricAttendance);
 
 // manual
-router.post("/manual", manualAttendanceEntry);
-router.put("/manualUpdate/:id", updateManualAttendanceEntry);
-
+router.post(
+  "/manual",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  manualAttendanceEntry
+);
+router.put(
+  "/manualUpdate/:id",
+  verifyToken,
+  checkRole(["admin", "hr"]),
+  updateManualAttendanceEntry
+);
 
 // GET attendance logs
 router.get("/logs/:employeeId", getAttendanceLogsByEmployeeId);
@@ -32,6 +43,5 @@ router.get("/logs", getAllAttendanceLogs);
 router.get("/daily", getAllDailyAttendanceController);
 
 router.get("/attendance/daily/id/:id", getDailyAttendanceById);
-
 
 export default router;

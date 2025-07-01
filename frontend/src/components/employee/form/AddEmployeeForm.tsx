@@ -310,7 +310,7 @@ export default function AddEmployeeForm() {
               options={userDepartmentOptions}
               placeholder="Select User"
               onChange={(val: number) => {
-                console.log("Selected User ID:", val); // ✅ use this to debug
+                console.log("Selected User ID:", val); // : use this to debug
                 setForm((prev) => ({ ...prev, coordinatorId: val }));
               }}
               className="dark:bg-dark-900"

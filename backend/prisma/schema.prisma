@@ -15,7 +15,7 @@ model User {
   password     String
   role         String
 
-  departmentId        Int? // ✅ must exist
+  departmentId        Int? // : must exist
   department          Department? @relation("DepartmentUsers", fields: [departmentId], references: [id])
   headOf              Department? @relation("DepartmentHead")
   employees           Employee[]  @relation("UserCoordinator")
@@ -31,7 +31,7 @@ model Department {
 
   headId    Int?       @unique
   head      User?      @relation("DepartmentHead", fields: [headId], references: [id])
-  users     User[]     @relation("DepartmentUsers") // ✅ all users in the department
+  users     User[]     @relation("DepartmentUsers") // : all users in the department
   employees Employee[]
 
   createdAt DateTime @default(now())
@@ -263,6 +263,7 @@ enum LeaveStatus {
 // CompOff
 model CompOff {
   id          Int           @id @default(autoincrement())
+   title       String
   employeeId  Int
   employee    Employee      @relation(fields: [employeeId], references: [id])
   workedFrom  DateTime

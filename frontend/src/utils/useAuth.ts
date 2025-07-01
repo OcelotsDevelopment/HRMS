@@ -12,7 +12,7 @@ type DecodedToken = {
   id: number;
   name?: string;
   email: string;
-  exp: number; // ✅ include the expiry timestamp
+  exp: number; // : include the expiry timestamp
   iat?: number;
 };
 

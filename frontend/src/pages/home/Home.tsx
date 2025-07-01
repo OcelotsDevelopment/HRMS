@@ -5,25 +5,24 @@ import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
 // import RecentOrders from "../../components/ecommerce/RecentOrders";
 import DemographicCard from "../../components/ecommerce/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
-import { useAuth } from '../../utils/useAuth';
+import { useAuth } from "../../utils/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDashboardStore } from "../../store/dashboardStore";
 import UpcomingEvents from "../../components/ecommerce/UpcomingEvents";
 
 export default function Home() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { data:overviewData, loading, fetchDashboard } = useDashboardStore();
-
+  const { data: overviewData, loading, fetchDashboard } = useDashboardStore();
 
   const safeEvents = overviewData?.upcomingEvents.map((event) => ({
-  ...event,
-  type: (event.type || "Info") as "Info" | "Success" | "Warning" | "Danger",
-}));
-  console.log(overviewData,"overviewDataoverviewDataoverviewDataoverviewData");
-  
+    ...event,
+    type: (event.type || "Info") as "Info" | "Success" | "Warning" | "Danger",
+  }));
+  console.log(overviewData, "overviewDataoverviewDataoverviewDataoverviewData");
+
   useEffect(() => {
     if (!user) navigate("/signin");
   }, [user, navigate]);
@@ -56,12 +55,11 @@ const navigate = useNavigate();
         </div> */}
 
         <div className="col-span-12 xl:col-span-5">
-  <DemographicCard data={overviewData.demographics || []} />
-</div>
-
+          <DemographicCard data={overviewData.demographics || []} />
+        </div>
 
         <div className="col-span-12 xl:col-span-7">
-         <UpcomingEvents data={safeEvents || []} />
+          <UpcomingEvents data={safeEvents || []} />
         </div>
       </div>
     </>

@@ -131,7 +131,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
             // placeholder="Select an option"
             onChange={(e) => setDepartmentId(Number(e))}
             className="dark:bg-dark-900"
-            value={departmentId} // ✅ pass controlled value here
+            value={departmentId} // : pass controlled value here
           />
         </div>
 

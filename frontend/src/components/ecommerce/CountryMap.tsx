@@ -27,10 +27,6 @@ const CountryMap: React.FC<CountryMapProps> = ({ data = [], mapColor }) => {
   france: [46.603354, 1.888334],
   sweden: [60.128161, 18.643501],
 };
-
-
-
-  console.log(data,"datadatadatadatadatadatadatadatadatadatadatadatadatadatadata");
   
   const markers = data
   .map((item) => {
@@ -63,7 +59,8 @@ const CountryMap: React.FC<CountryMapProps> = ({ data = [], mapColor }) => {
       map={worldMill}
       backgroundColor="transparent"
       markerStyle={{
-        initial: { fill: "#465FFF" },
+        initial: { fill: "#465FFF", width:"100%", },
+        
       }}
       markersSelectable={true}
       markers={markers}

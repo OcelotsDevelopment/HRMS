@@ -117,7 +117,7 @@ const selectedBankDetail = bankDetails?.find((b) => b.id === editBankId);
         <div className="relative w-full overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900">
           {editBankId && selectedBankDetail && (
             <EditBankDetailForm
-              bankDetail={selectedBankDetail} // ✅ Correct prop name and value
+              bankDetail={selectedBankDetail} // : Correct prop name and value
               onSuccess={closeEditModal}
             />
           )}

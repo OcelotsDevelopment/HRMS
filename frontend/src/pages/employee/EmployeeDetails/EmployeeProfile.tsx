@@ -86,8 +86,9 @@ export default function EmployeeProfiles() {
               setForm((prev) => ({ ...prev, [name]: value }))
             }
           />
-          <UserInfoCard />
           <UserAddressCard />
+          <UserInfoCard />
+          
         </div>
       </div>
     </>

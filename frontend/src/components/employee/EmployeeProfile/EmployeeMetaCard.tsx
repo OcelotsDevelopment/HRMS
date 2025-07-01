@@ -11,6 +11,8 @@ import getCroppedImg from "../../../utils/cropImageHelper";
 import type { Area } from "react-easy-crop";
 import Cropper from "react-easy-crop";
 import { useUploadStore } from "../../../store/uploadStore";
+import Badge from "../../ui/badge/Badge";
+import { useAttendanceStore } from "../../../store/attendanceStore";
 interface UserMetaCardProps {
   id: number;
   name: string;
@@ -73,6 +75,7 @@ export default function UserMetaCard({
   const { updateEmployee } = useEmployeeStore();
 
   const findDepartments = useDepartmentStore((state) => state.findDepartments);
+  const { fetchDaily, daily } = useAttendanceStore((state) => state);
 
   const uploadImage = useUploadStore((state) => state.uploadImage);
 
@@ -105,6 +108,10 @@ export default function UserMetaCard({
     }
   }, [findDepartments]);
 
+  useEffect(() => {
+    fetchDaily(id);
+  }, [id, fetchDaily]);
+
   // image upload
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,6 +121,24 @@ export default function UserMetaCard({
   const [zoom, setZoom] = useState(1);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+
+  const isPresentToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // strip time
+
+    return daily.some((entry) => {
+      const entryDate = new Date(entry.date);
+      entryDate.setHours(0, 0, 0, 0); // normalize date
+
+      return (
+        entry.employeeId === id &&
+        entryDate.getTime() === today.getTime() &&
+        entry.status === "PRESENT"
+      );
+    });
+  };
+
+  const currentStatus = isPresentToday() ? "Present" : "Absent";
 
   const triggerInput = () => {
     inputRef.current?.click();
@@ -271,6 +296,25 @@ export default function UserMetaCard({
                     {coordinator}
                   </p>
                 </div>
+              </div>
+              <div>
+                <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                  Current Status
+                </p>
+                <p
+                  className={`text-sm font-medium ${
+                    currentStatus === "Present"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                  }`}
+                >
+                  <Badge
+                    color={currentStatus == "Present" ? "success" : "error"}
+                    size="md"
+                  >
+                    {currentStatus}
+                  </Badge>
+                </p>
               </div>
 
               {/* <a

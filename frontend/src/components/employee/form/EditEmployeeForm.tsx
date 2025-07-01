@@ -144,7 +144,7 @@ export default function EditEmployeeForm({ employee }: Props) {
       ...form,
       age: Number(form.age),
       departmentId: Number(form.departmentId),
-      dateOfJoining: new Date(form.dateOfJoining).toISOString(), // ✅ Ensure ISO string format if backend expects it
+      dateOfJoining: new Date(form.dateOfJoining).toISOString(), // : Ensure ISO string format if backend expects it
     });
   };
 
