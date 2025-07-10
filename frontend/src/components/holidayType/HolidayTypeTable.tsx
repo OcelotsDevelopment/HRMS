@@ -27,9 +27,7 @@ export default function HolidayTypeTable({ openModal }: HolidayTypeTableProps) {
   }, [fetchHolidayTypes]);
 
   useEffect(() => {
-    if (holidayTypes) {
-        console.log(holidayTypes,"holidayTypesholidayTypesholidayTypes");
-        
+    if (holidayTypes) {        
       const formatted: HolidayTypeRow[] = holidayTypes?.map((item) => ({
         ...item,
         action: (

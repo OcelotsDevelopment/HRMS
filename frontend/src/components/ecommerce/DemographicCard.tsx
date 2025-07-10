@@ -99,30 +99,30 @@ export default function DemographicCard({ data }: Props) {
                       cy="12"
                       r="9"
                       stroke="currentColor"
-                      stroke-width="1.5"
+                      strokeWidth="1.5"
                     />
                     <path
                       d="M3.6 9H20.4"
                       stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                     />
                     <path
                       d="M3.6 15H20.4"
                       stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                     />
                     <path
                       d="M12 3C14.5 6 14.5 18 12 21C9.5 18 9.5 6 12 3Z"
                       stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
                     />
                     <path
                       d="M17.5 7.5C17.5 8.32843 16.8284 9 16 9C15.1716 9 14.5 8.32843 14.5 7.5C14.5 6.67157 15.1716 6 16 6C16.8284 6 17.5 6.67157 17.5 7.5Z"
                       stroke="currentColor"
-                      stroke-width="1.5"
+                      strokeWidth="1.5"
                     />
                   </svg>
                 </div>

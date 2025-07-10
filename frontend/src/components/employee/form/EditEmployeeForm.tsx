@@ -37,6 +37,7 @@ export default function EditEmployeeForm({ employee }: Props) {
     departmentId: 0,
     coordinatorId: 0,
     dateOfJoining: "",
+    baseSalary: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -109,6 +110,7 @@ export default function EditEmployeeForm({ employee }: Props) {
         dateOfJoining: selectedEmployee.dateOfJoining
           ? selectedEmployee.dateOfJoining.split("T")[0]
           : "",
+        baseSalary: selectedEmployee.salaryOnJoining?.toString() || "",
       });
     }
   }, [selectedEmployee, employee.id]);
@@ -144,6 +146,7 @@ export default function EditEmployeeForm({ employee }: Props) {
       ...form,
       age: Number(form.age),
       departmentId: Number(form.departmentId),
+      baseSalary: Number(form.baseSalary),
       dateOfJoining: new Date(form.dateOfJoining).toISOString(), // : Ensure ISO string format if backend expects it
     });
   };
@@ -235,6 +238,19 @@ export default function EditEmployeeForm({ employee }: Props) {
               placeholder="YYYY-MM-DD"
               error={!!errors.dateOfJoining}
               hint={errors.dateOfJoining}
+            />
+          </div>
+
+          <div>
+            <Label>Base Salary</Label>
+            <Input
+              name="baseSalary"
+              type="number"
+              value={form.baseSalary}
+              onChange={handleChange}
+              error={!!errors.baseSalary}
+              hint={errors.baseSalary}
+              placeholder="Enter base salary"
             />
           </div>
 

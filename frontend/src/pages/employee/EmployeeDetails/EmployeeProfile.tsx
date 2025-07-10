@@ -27,6 +27,7 @@ export default function EmployeeProfiles() {
     coordinatorId: 0,
     department: "",
     coordinator: "",
+    dateOfJoining:""
   });
 
   const { selectedEmployee, getEmployeeById, employees } = useEmployeeStore();
@@ -55,6 +56,7 @@ export default function EmployeeProfiles() {
         coordinatorId: selectedEmployee.coordinatorId || 0,
         department: selectedEmployee?.department?.name,
         coordinator: selectedEmployee?.coordinator?.name || "",
+        dateOfJoining:selectedEmployee?.dateOfJoining || ""
       });
     }
   }, [selectedEmployee, id]);
@@ -82,6 +84,7 @@ export default function EmployeeProfiles() {
             coordinator={form?.coordinator}
             departmentId={form?.departmentId}
             coordinatorId={form?.coordinatorId}
+            dateOfJoining={form?.dateOfJoining}
             handleChange={(name, value) =>
               setForm((prev) => ({ ...prev, [name]: value }))
             }

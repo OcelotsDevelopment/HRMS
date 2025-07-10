@@ -30,6 +30,7 @@ import {
   getBankDetailById,
   getAllPayrollsController,
   uploadEmployeeImageController,
+  getEarningsSummaryController,
 } from "../controller/employeeController.js";
 
 import { verifyToken } from "../middlewares/tokenVerification.js";
@@ -49,7 +50,7 @@ router.post(
   verifyToken,
   checkRole(["admin", "hr"]),
   addEmployment
-); // Add
+); 
 router.get("/employments/:id", listEmployment); // List by employee ID
 router.get("/employment/:id", getEmploymentById); // Get one
 router.put(
@@ -122,5 +123,8 @@ router.delete(
 // Any authenticated user can view bank details of employees
 router.get("/bank/employee/:employeeId", verifyToken, getBankDetailsByEmployee);
 router.get("/bank/:id", verifyToken, getBankDetailById);
+
+// GET /api/employee/earnings-summary/:id
+router.get("/earningsSummary/:id", getEarningsSummaryController);
 
 export default router;

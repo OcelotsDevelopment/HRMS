@@ -3,7 +3,6 @@ import sanitizedConfig from '../config.js';
 import { prisma } from '../config/db.js';
 
 export async function verifyToken(req, res, next) {
-  console.log("🔐 verifyToken middleware triggered");
 
   const authHeader = req.headers["authorization"];
   const token = authHeader?.startsWith("Bearer ")
@@ -32,7 +31,6 @@ export async function verifyToken(req, res, next) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      console.log(": User fetched from DB:", user);
       req.user = user; // Attach full user info with role
       next();
     } catch (dbErr) {

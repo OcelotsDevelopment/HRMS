@@ -7,9 +7,11 @@ import {
 } from "../../ui/table";
 import { useEffect, useState, type JSX } from "react";
 import { useUserStore } from "../../../store/userStore";
+import { useNavigate } from "react-router-dom";
 
 interface UserRow {
   id: number;
+  userUniqueId: string;
   name: string;
   email: string;
   image?: string;
@@ -24,13 +26,15 @@ interface UserTableProps {
 export default function UserTable({ openModal }: UserTableProps) {
   const [tableData, setTableData] = useState<UserRow[]>([]);
 
-  const { users,findUsers,fetchUsers } = useUserStore();
+  const navigate = useNavigate();
+  const { users, findUsers, fetchUsers } = useUserStore();
 
   useEffect(() => {
     if (findUsers) {
       setTableData(
         findUsers.map((item) => ({
           id: item.id,
+          userUniqueId: String(item?.userUniqueId),
           name: item.name,
           email: item.email,
           role: item?.role,
@@ -64,18 +68,73 @@ export default function UserTable({ openModal }: UserTableProps) {
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers,users]);
+  }, [fetchUsers, users]);
 
   useEffect(() => {
     const formatted = findUsers.map((user) => ({
       ...user,
       action: (
-        <button
-          onClick={() => openModal(user.id)}
-          className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-        >
-          Edit
-        </button>
+        // <button
+        //   onClick={() => openModal(user.id)}
+        //   className="flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+        // >
+        //   Edit
+        // </button>
+
+        <div className="flex items-center">
+          <button
+            onClick={() => openModal(user.id)}
+            className="px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 "
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16.5 3.5L20.5 7.5M4 20H8L18.29 9.71C18.68 9.32 18.68 8.68 18.29 8.29L15.71 5.71C15.32 5.32 14.68 5.32 14.29 5.71L4 16V20Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+              />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => navigate(`add-details/${user.id}`)}
+            className="px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 "
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M1 12C2.73 7.61 7.17 4.5 12 4.5C16.83 4.5 21.27 7.61 23 12C21.27 16.39 16.83 19.5 12 19.5C7.17 19.5 2.73 16.39 1 12Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
       ),
     }));
     setTableData(formatted);
@@ -87,6 +146,12 @@ export default function UserTable({ openModal }: UserTableProps) {
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
+              <TableCell
+                isHeader
+                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+              >
+                User ID
+              </TableCell>
               <TableCell
                 isHeader
                 className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -116,6 +181,9 @@ export default function UserTable({ openModal }: UserTableProps) {
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {tableData?.map((user) => (
               <TableRow key={user.id}>
+                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                  {user.userUniqueId}
+                </TableCell>
                 <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                   {user.name}
                 </TableCell>

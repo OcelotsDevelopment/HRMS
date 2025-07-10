@@ -29,7 +29,7 @@ export default function DailyAttendanceTable({
     if (dailyAttendance) {
       const formatted: DailyAttendanceRow[] = dailyAttendance.map((entry) => ({
         id: entry.id,
-        employeeName: entry.employee?.name ?? "—",
+        employeeName: entry.employee?.name ?? entry.User?.name ?? "—",
         date: new Date(entry.date).toLocaleDateString(),
         checkIn: entry.checkIn ? new Date(entry.checkIn).toLocaleTimeString() : "—",
         checkOut: entry.checkOut ? new Date(entry.checkOut).toLocaleTimeString() : "—",

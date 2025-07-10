@@ -42,14 +42,14 @@ export default function EcommerceMetrics({ data }: Props) {
               cy="8"
               r="3.5"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             />
             <path
               d="M4 20C4 16.6863 7.13401 14 11 14H13C16.866 14 20 16.6863 20 20"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </div>
@@ -119,33 +119,33 @@ export default function EcommerceMetrics({ data }: Props) {
             <path
               d="M3 21V5C3 4.44772 3.44772 4 4 4H20C20.5523 4 21 4.44772 21 5V21"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M3 10H21"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             />
             <path
               d="M7 14V18"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             />
             <path
               d="M12 14V18"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             />
             <path
               d="M17 14V18"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             />
           </svg>
         </div>
@@ -215,20 +215,20 @@ export default function EcommerceMetrics({ data }: Props) {
               height="18"
               rx="2"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
             />
             <path
               d="M3 9H21"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             />
             <path
               d="M9 14L11 16L15 12"
               stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </div>

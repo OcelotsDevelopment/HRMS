@@ -24,6 +24,7 @@ interface UserMetaCardProps {
   coordinator: string;
   departmentId: number;
   coordinatorId: number;
+  dateOfJoining:string;
   handleChange: (name: string, value: string) => void;
 }
 
@@ -48,6 +49,7 @@ export default function UserMetaCard({
   coordinator,
   departmentId,
   coordinatorId,
+  dateOfJoining,
   handleChange,
 }: UserMetaCardProps) {
   const [departmentOptions, setDepartmentOptions] = useState<Department[]>([]);
@@ -230,7 +232,7 @@ export default function UserMetaCard({
                       ? "../../../../public/maleEmployee.png"
                       : sex == "female"
                       ? "../../../../public/femaleEmployee.png"
-                      : ""
+                      : "../../../../public/ms-icon-310x310.png"
                   }
                   alt="Profile"
                   className="object-cover w-full h-full"
@@ -296,6 +298,19 @@ export default function UserMetaCard({
                     {coordinator}
                   </p>
                 </div>
+
+                <div>
+                  <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
+                    Date Of Joining
+                  </p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {new Date(dateOfJoining).toDateString()}
+                  </p>
+                </div>
+
+                
+
+                
               </div>
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">

@@ -10,7 +10,7 @@ import {
 // Generic row type where all values must be renderable (ReactNode)
 type RowData = Record<string, ReactNode>;
 
-interface Column<T extends RowData> {
+export interface Column<T extends RowData> {
   key: keyof T;
   label: string;
   isAction?: boolean;

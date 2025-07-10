@@ -18,11 +18,6 @@ function Attendance() {
             label: "Daily Attendence",
             content: <ListDailyAttendance />,
           },
-          {
-            id: "tab3",
-            label: "Payroll",
-            content: <div>Hello2</div>,
-          },
         ]}
       />
       {/* </div> */}

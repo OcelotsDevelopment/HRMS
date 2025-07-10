@@ -139,7 +139,6 @@ export const getAllPendingLeavesService = async (page = 1, status = "") => {
     const skip = (page - 1) * limit;
 
     const where = status ? { status } : {}; // Apply status filter if provided
-    console.log(status, "staustsalsaoijusoiusoijsjt");
 
     const [leaves, totalCount] = await Promise.all([
       prisma.leave.findMany({
@@ -404,7 +403,6 @@ export const deleteEventService = async (id) => {
 // Create CompOff
 export const createCompOffService = async (data) => {
   const { title, workedFrom, workedTo, reason, daysGranted, employeeId } = data;
-  console.log(data, "datadatadatadatadatadatadatadatadata");
 
   if (!title?.trim()) throw new Error("Title is required");
   if (!workedFrom || isNaN(new Date(workedFrom)))

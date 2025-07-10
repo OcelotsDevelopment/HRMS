@@ -11,6 +11,9 @@ type AttendanceLog = {
   employee?: {
     name: string;
   };
+  User?: {
+    name: string;
+  };
 };
 
 type DailyAttendance = {
@@ -51,6 +54,13 @@ interface DailyAttendanceEntry {
     department: {
       name: string;
     };
+  };
+
+  User?: {
+    id: number;
+    name: string;
+    email: string;
+    employeeCode: string;
   };
 }
 
@@ -129,10 +139,8 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
     }
   },
 
-  updateLog: async (id,data) => {
+  updateLog: async (id, data) => {
     set({ loading: true, error: null });
-    console.log(data,"datadatadatadatadatadatadatadatadata");
-    
     try {
       const token = localStorage.getItem("auth_token");
       await api.put(`/attendance/manualUpdate/${id}`, data, {
@@ -171,8 +179,6 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
       set({ loading: false });
     }
   },
-
-  
 
   updateDaily: async (id, data) => {
     set({ loading: true, error: null });

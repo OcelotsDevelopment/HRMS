@@ -14,18 +14,13 @@ export interface Column<T extends RowData> {
   isAction?: boolean;
 }
 
-// interface Employee {
-//   id: number;
-//   name: string;
-// }
-
 interface PayrollExportRow {
   Month: string;
   "Basic Salary": string;
   Allowances: string;
   Deductions: string;
   "Net Salary": string;
-  employee: string; // 👈 this was previously: Employee
+  employee: string; 
 }
 
 // Make sure this extends RowData
@@ -36,7 +31,7 @@ interface PayrollRow extends RowData {
   allowances: string;
   deductions: string;
   netSalary: string;
-  employee: string; // 👈 not Employee object, just the name
+  employee: string;
   action: ReactNode;
 }
 
@@ -65,7 +60,7 @@ export default function PayrollTable() {
             (p.taxDeduction || 0)
           ).toFixed(2)}`,
           "Net Salary": `₹ ${p.netPay?.toFixed(2) ?? "0.00"}`,
-          employee: p.employee?.name ?? "—", // 👈 use name only
+          employee: p.employee?.name ?? "—", 
         };
 
         return {
@@ -75,14 +70,14 @@ export default function PayrollTable() {
           allowances: exportRow.Allowances,
           deductions: exportRow.Deductions,
           netSalary: exportRow["Net Salary"],
-          employee: exportRow.employee, // 👈 assign string
+          employee: exportRow.employee,
           action: renderActions(exportRow, p.month, p.year),
         };
       });
 
       setTableData(formatted);
     }
-  }, [allPayrolls]);
+  }, [allPayrolls,]);
 
   // Render export buttons
   const renderActions = (
@@ -148,7 +143,7 @@ export default function PayrollTable() {
 
   // Define table columns
   const columns: Column<PayrollRow>[] = [
-    { key: "employee", label: "Employee" }, // 👈 new column
+    { key: "employee", label: "Employee" },
     { key: "month", label: "Month" },
     { key: "basicSalary", label: "Basic Salary" },
     { key: "allowances", label: "Allowances" },

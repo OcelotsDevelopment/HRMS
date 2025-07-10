@@ -15,18 +15,18 @@ export default function LeaveInfo() {
   const [leaveId, setLeaveId] = useState<number>();
 
   const { id } = useParams();
-  const { leavesEach, leaveBalanceEach, fetchLeavesEach } = useWorkforceStore();
+  const { leaves, leaveBalanceEach, fetchLeavesEach } = useWorkforceStore();
 
   useEffect(() => {
     if (id) fetchLeavesEach(Number(id));
   }, [fetchLeavesEach, id]);
 
-  useEffect(() => {
-    if (leavesEach) {
-      setOpen(false);
-      setOpenEdit(false);
+  useEffect(()=>{
+    if(leaves){
+      setOpen(false)
+      setOpenEdit(false)
     }
-  }, [leavesEach]);
+  },[leaves])
 
   return (
     <>
@@ -38,12 +38,12 @@ export default function LeaveInfo() {
             {leaveBalanceEach?.totalAccrued ?? "-"} days
           </div>
           <div>
-            <strong>Total Used:</strong>{" "}
-            {leaveBalanceEach?.totalUsed ?? "-"} days
+            <strong>Total Used:</strong> {leaveBalanceEach?.totalUsed ?? "-"}{" "}
+            days
           </div>
           <div>
-            <strong>Remaining:</strong>{" "}
-            {leaveBalanceEach?.remaining ?? "-"} days
+            <strong>Remaining:</strong> {leaveBalanceEach?.remaining ?? "-"}{" "}
+            days
           </div>
           <div>
             <strong>Remaining This Month:</strong>{" "}

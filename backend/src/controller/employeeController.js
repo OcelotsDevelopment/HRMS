@@ -32,6 +32,7 @@ import {
   getBankDetailsByEmployeeService,
   getBankDetailByIdService,
   uploadEmployeeImageService,
+  getEmployeeEarningsSummary,
 } from "../services/employee.service.js";
 
 // @desc    Create new employee
@@ -269,3 +270,16 @@ export const getBankDetailById = asyncHandler(async (req, res) => {
   const result = await getBankDetailByIdService(Number(req.params.id));
   res.status(200).json(result);
 });
+
+
+// @desc    Get single bank detail by ID
+// @route   GET api/employee/:id/earnings-summary
+export const getEarningsSummaryController = async (req, res) => {
+  try {
+    const employeeId = parseInt(req.params.id);    
+    const data = await getEmployeeEarningsSummary(employeeId);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

@@ -1,5 +1,13 @@
 import { prisma } from "../config/db.js";
 import { uploadToCloudflare } from "../utils/cloudflareUploader.js";
+import {
+  isBefore,
+  addDays,
+  addMonths,
+  differenceInCalendarDays,
+  endOfDay,
+  startOfDay,
+} from "date-fns";
 
 function isValidDate(input) {
   const date = new Date(input);
@@ -198,13 +206,17 @@ export const getEmployeeByIdService = async (id) => {
 
 export const updateEmployeeService = async (id, data) => {
   try {
-    // Validate and convert DOB
-    if (data.dob && !isValidDate(data.dob))
+    console.log(data, "============================");
+
+    // Convert and validate dates
+    if (data.dob && !isValidDate(data.dob)) {
       throw new Error("Invalid date of birth");
+    }
     if (data.dob) data.dob = new Date(data.dob);
 
-    if (data.dateOfJoining && !isValidDate(data.dateOfJoining))
+    if (data.dateOfJoining && !isValidDate(data.dateOfJoining)) {
       throw new Error("Invalid date of joining");
+    }
     if (data.dateOfJoining) data.dateOfJoining = new Date(data.dateOfJoining);
 
     // Validate coordinatorId
@@ -227,10 +239,21 @@ export const updateEmployeeService = async (id, data) => {
       }
     }
 
-    // Update the employee
+    // Destructure and restructure relation fields
+    const { departmentId, coordinatorId, baseSalary, ...rest } = data;
+
     const employee = await prisma.employee.update({
       where: { id },
-      data,
+      data: {
+        ...rest,
+        department: departmentId
+          ? { connect: { id: departmentId } }
+          : undefined,
+        coordinator: coordinatorId
+          ? { connect: { id: coordinatorId } }
+          : undefined,
+        salaryOnJoining: baseSalary ? Number(baseSalary) : undefined,
+      },
     });
 
     return { employee };
@@ -252,9 +275,10 @@ export const addEmploymentService = async (data) => {
   const employment = await prisma.employment.create({
     data: {
       ...data,
-      workedFrom: new Date(data.workedFrom),
-      workedTill: new Date(data.workedTill),
-      employeeId: data?.employeeId,
+      workedFrom: data.workedFrom ? new Date(data.workedFrom) : undefined,
+      workedTill: data.workedTill ? new Date(data.workedTill) : undefined,
+      employeeId: Number(data.employeeId),
+     salaryOnJoining: data.baseSalary ? Number(data.baseSalary) : undefined,
     },
   });
 
@@ -307,8 +331,14 @@ export const updateEmploymentService = async (id, data) => {
 };
 
 // Update Image
-export const uploadEmployeeImageService = async (id, fileBuffer, originalName) => {
-  const employee = await prisma.employee.findUnique({ where: { id: Number(id) } });
+export const uploadEmployeeImageService = async (
+  id,
+  fileBuffer,
+  originalName
+) => {
+  const employee = await prisma.employee.findUnique({
+    where: { id: Number(id) },
+  });
   if (!employee) throw new Error("Employee not found");
 
   const cloudflareResult = await uploadToCloudflare(fileBuffer, originalName);
@@ -326,8 +356,6 @@ export const uploadEmployeeImageService = async (id, fileBuffer, originalName) =
   return imageUrl;
 };
 
-
-
 // Delete employment
 export const deleteEmploymentService = async (id) => {
   await prisma.employment.delete({ where: { id } });
@@ -335,7 +363,6 @@ export const deleteEmploymentService = async (id) => {
 };
 
 //            {// qualification}
-
 // Add qualification
 export const addQualificationService = async (data) => {
   const employee = await prisma.employee.findUnique({
@@ -597,4 +624,121 @@ export const getBankDetailsByEmployeeService = async (employeeId) => {
 
 export const getBankDetailByIdService = async (id) => {
   return prisma.bankDetail.findUnique({ where: { id } });
+};
+
+// EARN AND DEDUCTION
+export const getEmployeeEarningsSummary = async (employeeId) => {
+  const employee = await prisma.employee.findUnique({
+    where: { id: employeeId },
+  });
+
+  if (!employee || !employee.dateOfJoining) {
+    throw new Error("Employee or joining date not found");
+  }
+
+  const summaries = [];
+  const today = new Date();
+  const joinDate = new Date(employee.dateOfJoining);
+
+  let cycleStart = new Date(joinDate);
+  let cycleEnd = new Date(joinDate);
+  if (cycleEnd.getDate() <= 3) {
+    cycleEnd.setDate(3);
+  } else {
+    cycleEnd.setMonth(cycleEnd.getMonth() + 1);
+    cycleEnd.setDate(3);
+  }
+
+  while (isBefore(cycleStart, today)) {
+    const payroll = await prisma.payroll.findFirst({
+      where: {
+        employeeId,
+        paymentDate: {
+          gte: startOfDay(cycleStart),
+          lte: endOfDay(cycleEnd),
+        },
+      },
+    });
+
+    const leaves = await prisma.leave.findMany({
+      where: {
+        employeeId,
+        status: "APPROVED",
+        OR: [
+          {
+            from: { lte: cycleEnd, gte: cycleStart },
+          },
+          {
+            to: { lte: cycleEnd, gte: cycleStart },
+          },
+          {
+            AND: [{ from: { lte: cycleStart } }, { to: { gte: cycleEnd } }],
+          },
+        ],
+      },
+    });
+
+    const leaveDays = leaves.reduce((sum, leave) => {
+      const from = new Date(leave.from < cycleStart ? cycleStart : leave.from);
+      const to = new Date(leave.to > cycleEnd ? cycleEnd : leave.to);
+      return sum + (differenceInCalendarDays(to, from) + 1);
+    }, 0);
+
+    // Monthly entitlement
+    const leaveEntitlement = 1.5;
+    let adjustedLeaveDays = leaveDays;
+
+    //Check for unused Comp Offs in this cycle
+    const compOffs = await prisma.compOff.findMany({
+      where: {
+        employeeId,
+        status: { notIn: ["USED", "REJECTED"] },
+        workedFrom: { lte: cycleEnd },
+        workedTo: { gte: cycleStart },
+      },
+    });
+
+    const availableCompOffDays = compOffs.reduce(
+      (sum, c) => sum + (c.daysGranted ?? 0),
+      0
+    );
+
+    // Excess leave = leave - entitlement - compOffs
+    const excessLeaveDays = Math.max(
+      0,
+      adjustedLeaveDays - leaveEntitlement - availableCompOffDays
+    );
+
+    const baseSalary = payroll?.baseSalary ?? employee.salaryOnJoining ?? 0;
+    const totalDaysInCycle = differenceInCalendarDays(cycleEnd, cycleStart) + 1;
+    const perDaySalary = baseSalary / totalDaysInCycle;
+
+    const computedDeduction = Math.round(excessLeaveDays * perDaySalary);
+
+    const workingDays = totalDaysInCycle - leaveDays;
+
+    summaries.push({
+      cycle: `${cycleStart.toISOString().slice(0, 10)} to ${cycleEnd
+        .toISOString()
+        .slice(0, 10)}`,
+      baseSalary,
+      incentives: payroll?.otherAllowances ?? 0,
+      deductions: computedDeduction,
+      netPay:
+        (payroll?.netPay ?? baseSalary + (payroll?.otherAllowances ?? 0)) -
+        computedDeduction,
+      workingDays,
+      leaveDays,
+      employeeName: employee.name,
+      joinDate: employee.dateOfJoining,
+    });
+
+    //Next cycle: 4th to 3rd
+    cycleStart = addDays(cycleEnd, 1); // 4th
+    cycleEnd = new Date(cycleStart);
+    cycleEnd.setMonth(cycleEnd.getMonth() + 1);
+    cycleEnd.setDate(3);
+  }
+
+  return summaries;
 };

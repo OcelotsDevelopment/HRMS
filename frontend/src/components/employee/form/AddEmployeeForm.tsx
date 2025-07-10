@@ -31,6 +31,7 @@ export default function AddEmployeeForm() {
     maritalStatus: "",
     departmentId: 0,
     coordinatorId: 0,
+    baseSalary: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -102,6 +103,8 @@ export default function AddEmployeeForm() {
       newErrors.email = "Invalid email format.";
     if (!form.mobile.trim()) newErrors.mobile = "Mobile number is required.";
     if (!form.dob.trim()) newErrors.dob = "Date of birth is required.";
+    if (!form.baseSalary.trim())
+      newErrors.baseSalary = "Base Salary is required.";
     if (!form.departmentId || form.departmentId <= 0)
       newErrors.departmentId = "Department is required.";
     if (!form.coordinatorId || form.coordinatorId <= 0)
@@ -126,7 +129,8 @@ export default function AddEmployeeForm() {
       ...form,
       age: Number(form.age),
       departmentId: Number(form.departmentId),
-      dateOfJoining: new Date(form.dateOfJoining).toISOString(), // optional
+      baseSalary: Number(form.baseSalary),
+      dateOfJoining: new Date(form.dateOfJoining).toISOString(),
     });
   };
 
@@ -217,6 +221,19 @@ export default function AddEmployeeForm() {
               onChange={handleChange}
               error={!!errors.dateOfJoining}
               hint={errors.dateOfJoining}
+            />
+          </div>
+
+          <div>
+            <Label>Base Salary</Label>
+            <Input
+              name="baseSalary"
+              type="number"
+              value={form.baseSalary}
+              onChange={handleChange}
+              placeholder="Enter base salary"
+              error={!!errors.baseSalary}
+              hint={errors.baseSalary}
             />
           </div>
 

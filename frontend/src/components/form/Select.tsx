@@ -8,7 +8,7 @@ interface SelectProps {
   placeholder?: string;
   onChange: (value: number) => void;
   className?: string;
-  value: number | ""; // 👈 controlled value
+  value: number | "";
 }
 
 const Select: React.FC<SelectProps> = ({

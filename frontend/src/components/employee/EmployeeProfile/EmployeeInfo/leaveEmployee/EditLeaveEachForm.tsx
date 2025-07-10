@@ -80,7 +80,7 @@ export default function EditLeaveEachForm({ leaveId }: EditLeaveFormProps) {
         from: new Date(form.from).toISOString(),
         to: new Date(form.to).toISOString(),
       });
-      closeModal();
+     
     } catch (err) {
       console.error("Error updating leave:", err);
     }

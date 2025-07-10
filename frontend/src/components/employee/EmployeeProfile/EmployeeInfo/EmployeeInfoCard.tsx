@@ -1,5 +1,6 @@
 import { Tabs } from "../../../ui/tab/Tabs";
 import BankDetailInfo from "./bankDetails/BankDetailInfo";
+import EmployeeEarningsList from "./earnAndDeduc/EmployeeEarningsList";
 import EmploymentInfo from "./Employment/EmploymentInfo";
 import LeaveInfo from "./leaveEmployee/LeaveInfo";
 import PayrollInfo from "./Payroll/PayrollInfo";
@@ -8,7 +9,6 @@ import QualificationInfo from "./Qualification/QualificationInfo";
 export default function UserInfoCard() {
   return (
     <>
-      {/* <div className="max-w-5xl p-6 mx-auto bg-white rounded-2xl dark:bg-gray-900"> */}
       <Tabs
         tabs={[
           {
@@ -29,17 +29,20 @@ export default function UserInfoCard() {
           {
             id: "tab4",
             label: "Payroll",
-            content: <PayrollInfo/>,
+            content: <PayrollInfo />,
           },
-
           {
             id: "tab5",
             label: "Leave",
-            content: <LeaveInfo/>,
+            content: <LeaveInfo />,
+          },
+          {
+            id: "tab6",
+            label: "Earnings & Deductions",
+            content: <EmployeeEarningsList />,
           },
         ]}
       />
-      {/* </div> */}
     </>
   );
 }

@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { api } from "../services/api";
 import axios from "axios";
 import type { Pagination } from "../types/paginationType";
+import type { EarningsSummaryRaw } from "../types/employeeType";
 
 // bank details
 export interface BankDetail {
@@ -97,6 +98,7 @@ type Employee = {
   designation?: string;
   sex?: string;
   dob?: string;
+  baseSalary:number;
   age?: number;
   placeOfBirth?: string;
   profileImageUrl: string;
@@ -188,6 +190,9 @@ type EmployeeState = {
   updateBankDetail: (id: number, data: Partial<BankDetail>) => Promise<void>;
   fetchBankDetailsByEmployee: (employeeId: number) => Promise<void>;
   deleteBankDetail: (id: number) => Promise<void>;
+
+  earningsSummary: EarningsSummaryRaw[];
+  fetchEarningsSummary: (employeeId: number) => Promise<void>;
 };
 
 export const useEmployeeStore = create<EmployeeState>()(
@@ -213,6 +218,9 @@ export const useEmployeeStore = create<EmployeeState>()(
         limit: 10,
         totalPages: 1,
       },
+
+      // earnings
+      earningsSummary: [],
 
       loading: false,
       error: null,
@@ -600,6 +608,22 @@ export const useEmployeeStore = create<EmployeeState>()(
               .getState()
               .fetchBankDetailsByEmployee(employeeId);
           }
+        } catch (err) {
+          handleError(err, set);
+        }
+      },
+
+      fetchEarningsSummary: async (employeeId) => {
+        set({ loading: true, error: null });
+        try {
+          const token = localStorage.getItem("auth_token");
+          const {data} = await api.get(`/employee/earningsSummary/${employeeId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          console.log(data?.data,"res.datares.datares.datares.datares.datares.data");
+          
+          set({ earningsSummary: data?.data, loading: false });
         } catch (err) {
           handleError(err, set);
         }

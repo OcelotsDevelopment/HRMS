@@ -14,6 +14,7 @@ import ListHoliday from "./pages/workforce/holiday/ListHoliday";
 import Attendance from "./pages/attendance/Attendance";
 import ViewPayrollPage from "./pages/payroll/ViewPayrollPage";
 import MainLeave from "./pages/workforce/leave/MainLeave";
+import UserProfile from "./pages/user/userDetails/UserProfile";
 
 function App() {
   return (
@@ -24,12 +25,16 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/depart-managment" element={<ListDepartment />} />
             <Route path="/user-management" element={<ListUser />} />
+            <Route
+              path="/employee-management/add-details/:id"
+              element={<EmployeeProfiles />}
+            />
 
             {/* employee managment */}
             <Route path="/employee-management" element={<ListEmployee />} />
             <Route
-              path="/employee-management/add-details/:id"
-              element={<EmployeeProfiles />}
+              path="/user-management/add-details/:id"
+              element={<UserProfile />}
             />
 
             {/* workforce */}
@@ -47,6 +52,9 @@ function App() {
 
             {/* SETTINGS */}
             <Route path="/settings" element={<Setting />} />
+
+            {/* sample */}
+            {/* <Route path="/sample" element={<DefaultInputs/>}/> */}
           </Route>
 
           <Route path="/signin" element={<SignInForm />} />

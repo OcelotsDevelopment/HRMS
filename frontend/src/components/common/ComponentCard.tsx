@@ -6,7 +6,7 @@ interface ComponentCardProps {
   className?: string;
   desc?: string;
   buttonTitle?: string;
-  handleButtonClick?: () => void; // 👈 this is the correct type
+  handleButtonClick?: () => void;
 }
 
 

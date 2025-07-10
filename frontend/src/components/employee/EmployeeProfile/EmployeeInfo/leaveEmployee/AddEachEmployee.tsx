@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useModal } from "../../../../../hooks/useModal";
 import { useEmployeeStore } from "../../../../../store/employeeStore";
 import { useWorkforceStore } from "../../../../../store/workforceStore";
 import ComponentCard from "../../../../common/ComponentCard";
@@ -9,8 +8,7 @@ import TextArea from "../../../../input/TextArea";
 import Button from "../../../../ui/button/Button";
 
 export default function AddLeaveEachForm() {
-  const { closeModal } = useModal();
-  const { addLeave, error,leaves } = useWorkforceStore();
+  const { addLeave, error } = useWorkforceStore();
   const { selectedEmployee } = useEmployeeStore();
 
   const [form, setForm] = useState({
@@ -33,11 +31,7 @@ export default function AddLeaveEachForm() {
     }
   }, [selectedEmployee]);
 
-  useEffect(()=>{
-    if(leaves){
-      closeModal()
-    }
-  },[leaves,closeModal])
+  
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -72,7 +66,7 @@ export default function AddLeaveEachForm() {
         from: new Date(form.from).toISOString(),
         to: new Date(form.to).toISOString(),
       });
-      closeModal();
+      
     } catch (err) {
       console.error("Error adding leave:", err);
     }

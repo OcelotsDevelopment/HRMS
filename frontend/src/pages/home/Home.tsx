@@ -21,7 +21,6 @@ export default function Home() {
     ...event,
     type: (event.type || "Info") as "Info" | "Success" | "Warning" | "Danger",
   }));
-  console.log(overviewData, "overviewDataoverviewDataoverviewDataoverviewData");
 
   useEffect(() => {
     if (!user) navigate("/signin");
