@@ -5,7 +5,6 @@ import Label from "../../../../components/form/Label";
 
 import { useDepartmentStore } from "../../../../store/departmentStore";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useUserStore } from "../../../../store/userStore";
 import type { Area } from "react-easy-crop";
 import Cropper from "react-easy-crop";
 import { useUploadStore } from "../../../../store/uploadStore";
@@ -63,7 +62,6 @@ export default function UserMetaCard({
   const findUserDepartments = useDepartmentStore((state) => state.findUserDepartments);
   const findDepartments = useDepartmentStore((state) => state.findDepartments);
 
-  const { updateUser } = useUserStore();
   const uploadImage = useUploadStore((state) => state.uploadImage);
 
   useEffect(() => {
@@ -262,7 +260,7 @@ export default function UserMetaCard({
             </div>
             <div className="flex items-center gap-3 mt-6 justify-end">
               <Button size="sm" variant="outline" onClick={closeModal}>Close</Button>
-              <Button size="sm" type="submit">Save Changes</Button>
+              <Button size="sm" >Save Changes</Button>
             </div>
           </form>
         </div>

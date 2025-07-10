@@ -51,7 +51,7 @@ type Qualification = {
 
 type Employment = {
   id?: number;
-  employeeId: number;
+  employeeId?: number;
   employerName: string;
   positionHeld: string;
   location: string;

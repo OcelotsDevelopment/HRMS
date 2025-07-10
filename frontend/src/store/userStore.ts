@@ -36,7 +36,7 @@ type UserState = {
   addUser: (name: string, email: string, departmentId: number) => Promise<void>;
   updateUser: (
     id: number,
-    data: { name: string; email: string; departmentId: number,role:string }
+    data: { name: string; email: string; departmentId: number }
   ) => Promise<void>;
   getUserById: (id: number) => Promise<void>;
 

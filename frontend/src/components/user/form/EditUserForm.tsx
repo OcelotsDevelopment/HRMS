@@ -28,7 +28,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
     departmentId?: string;
   }>({});
 
-  const updateUser = useUserStore((state) => state.updateUser);
+  // const updateUser = useUserStore((state) => state.updateUser);
   const getUserById = useUserStore((state) => state.getUserById);
   const selectedUser = useUserStore((state) => state.selectedUser);
   const findDepartments = useDepartmentStore((state) => state.findDepartments);
@@ -82,7 +82,7 @@ export default function EditUserForm({ user }: EditUserFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    await updateUser(user.id, { name, email, departmentId });
+    // await updateUser(user.id, { name, email, departmentId });
   };
 
   return (
