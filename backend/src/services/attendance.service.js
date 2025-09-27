@@ -92,7 +92,9 @@ export const pushBiometricAttendanceService = async (data) => {
   const timestamp = new Date(Time);
 
   // Round to nearest second (some biometric devices are millisecond accurate)
-  const roundedTimestamp = new Date(Math.floor(timestamp.getTime() / 1000) * 1000);
+  const roundedTimestamp = new Date(
+    Math.floor(timestamp.getTime() / 1000) * 1000
+  );
 
   const employee = await prisma.employee.findFirst({
     where: { employeeUniqueId: String(UserID) },
@@ -129,19 +131,19 @@ export const pushBiometricAttendanceService = async (data) => {
   startOfDay.setHours(0, 0, 0, 0);
 
   const latestLog = await prisma.attendanceLog.findFirst({
-  where: {
-    ...(employeeId ? { employeeId } : {}),
-    ...(userId ? { userId } : {}),
-    timestamp: {
-      lt: roundedTimestamp, // Only logs before current punch
+    where: {
+      ...(employeeId ? { employeeId } : {}),
+      ...(userId ? { userId } : {}),
+      timestamp: {
+        lt: roundedTimestamp, // Only logs before current punch
+      },
     },
-  },
-  orderBy: {
-    timestamp: "desc",
-  },
-});
+    orderBy: {
+      timestamp: "desc",
+    },
+  });
 
-const punchType = latestLog?.punchType === "IN" ? "OUT" : "IN";
+  const punchType = latestLog?.punchType === "IN" ? "OUT" : "IN";
 
   const log = await prisma.attendanceLog.create({
     data: {
@@ -165,7 +167,6 @@ const punchType = latestLog?.punchType === "IN" ? "OUT" : "IN";
 
   return { log, summary };
 };
-
 
 // 2. Manual Attendance Entry
 export const manualAttendanceEntryService = async (data) => {
@@ -504,37 +505,77 @@ export const getAllAttendanceLogsService = async () => {
 };
 
 // services/attendance.service.js
-export const getAllDailyAttendanceService = async () => {
-  const dailyAttendance = await prisma.dailyAttendance.findMany({
-    include: {
-      employee: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          employeeCode: true,
-          employeeUniqueId: true,
-          department: {
-            select: { name: true },
+export const getAllDailyAttendanceService = async ({
+  date,
+  page = 1,
+  limit = 10,
+}) => {
+  const skip = (page - 1) * limit;
+  const whereClause = {};
+
+  console.log(date, "datedatedatedatedatedatedate");
+
+  if (date) {
+    // ISO range for that full day
+    const startOfDay = new Date(`${date}T00:00:00.000Z`);
+    const endOfDay = new Date(`${date}T23:59:59.999Z`);
+
+    whereClause.OR = [
+      {
+        checkIn: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      {
+        checkOut: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    ];
+  }
+
+  const [data, total] = await Promise.all([
+    prisma.dailyAttendance.findMany({
+      where: whereClause,
+      include: {
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            employeeCode: true,
+            employeeUniqueId: true,
+            department: {
+              select: { name: true },
+            },
+          },
+        },
+        User: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            userUniqueId: true,
+            role: true,
           },
         },
       },
-      User: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          userUniqueId: true,
-          role: true,
-        },
-      },
-    },
-    orderBy: {
-      date: "desc",
-    },
-  });
+      orderBy: { createdAt: "desc", },
+      skip,
+      take: limit,
+    }),
 
-  return { dailyAttendance };
+    prisma.dailyAttendance.count({
+      where: whereClause,
+    }),
+  ]);
+
+  return {
+    data,
+    total,
+  };
 };
 
 // Get punch logs for an employee

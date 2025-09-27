@@ -73,13 +73,25 @@ export const getAllAttendanceLogs = asyncHandler(async (req, res) => {
 // controllers/attendanceController.js
 export const getAllDailyAttendanceController = async (req, res) => {
   try {
-    const result = await getAllDailyAttendanceService();
-    res.status(200).json({ success: true, data: result.dailyAttendance });
+    const { date, page = 1, limit = 10 } = req.query;
+
+    const result = await getAllDailyAttendanceService({
+      date,
+      page: Number(page),
+      limit: Number(limit),
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result.data,
+      total: result.total,
+    });
   } catch (error) {
     console.error("Error fetching daily attendance:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch daily attendance" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch daily attendance",
+    });
   }
 };
 

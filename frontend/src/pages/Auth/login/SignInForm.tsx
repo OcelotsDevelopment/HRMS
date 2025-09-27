@@ -77,13 +77,13 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen px-4 overflow-auto md:items-center md:justify-center bg-amber-50">
+    <div className="flex flex-col flex-1 min-h-screen px-4 overflow-auto md:items-center md:justify-center bg-white">
       {loading && <Loader />}
-      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
-        <div>
+      <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto rounded-lg">
+        <div className="">
           <div className="sm:mb-8">
             <img src="/images/logo/logo.png" />
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+            <h1 className="mb-2 font-semibold text-grey text-title-sm dark:text-white/90 sm:text-title-md">
               Sign In
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -134,7 +134,8 @@ export default function SignInForm() {
                   </Button> */}
                   <button
                     type="submit"
-                    className="w-full px-4 py-3 text-sm text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition"
+                    className="w-full px-4 py-3 text-sm text-black hover:opacity-90 rounded-lg transition"
+                    style={{ backgroundColor: "#f8ee0f" }}
                   >
                     Next
                   </button>
@@ -201,7 +202,8 @@ export default function SignInForm() {
 
                   <button
                     type="submit"
-                    className="w-full px-4 py-3 text-sm text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition"
+                    className="w-full px-4 py-3 text-sm text-black hover:opacity-90 rounded-lg transition"
+                    style={{ backgroundColor: "#f8ee0f" }}
                   >
                     Sign In
                   </button>

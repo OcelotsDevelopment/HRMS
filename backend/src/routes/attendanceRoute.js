@@ -39,8 +39,9 @@ router.get("/daily/:id", getDailyAttendanceByEmployeeId);
 // GET /api/attendance/logs - fetch all logs for all employees
 router.get("/logs", getAllAttendanceLogs);
 
-// routes/attendanceRoutes.js
+// routes/attendance.routes.js
 router.get("/daily", getAllDailyAttendanceController);
+
 
 router.get("/attendance/daily/id/:id", getDailyAttendanceById);
 

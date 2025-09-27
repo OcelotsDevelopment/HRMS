@@ -64,6 +64,13 @@ interface DailyAttendanceEntry {
   };
 }
 
+type FetchDailyAttendanceParams = {
+  employeeId?: number;
+  date?: string;
+  page?: number;
+  limit?: number;
+};
+
 type AttendanceState = {
   logs: AttendanceLog[];
   daily: DailyAttendance[];
@@ -71,9 +78,10 @@ type AttendanceState = {
   error: string | null;
   selectedLog: AttendanceLog | null;
   dailyAttendance: DailyAttendanceEntry[];
+  total: number;
   selectedDaily: DailyAttendanceEntry | null;
 
-  fetchDailyAttendance: () => Promise<void>;
+  fetchDailyAttendance: (params: FetchDailyAttendanceParams) => Promise<void>;
 
   fetchLogs: () => Promise<void>;
   addLog: (data: AttendanceLog) => Promise<void>;
@@ -93,6 +101,7 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
   daily: [],
   selectedLog: null,
   dailyAttendance: [],
+  total: 0,
   selectedDaily: null,
   loading: false,
   error: null,
@@ -110,16 +119,30 @@ export const useAttendanceStore = create<AttendanceState>((set) => ({
     }
   },
 
-  fetchDailyAttendance: async () => {
+  fetchDailyAttendance: async ({
+    date,
+    page = 1,
+    limit = 10,
+  }: FetchDailyAttendanceParams) => {
     set({ loading: true, error: null });
 
     try {
       const token = localStorage.getItem("auth_token");
+
       const res = await api.get("/attendance/daily", {
         headers: { Authorization: `Bearer ${token}` },
+        params: {
+          date, // already string like '2025-07-14'
+          page,
+          limit,
+        },
       });
 
-      set({ dailyAttendance: res.data.data, loading: false });
+      set({
+        dailyAttendance: res.data.data,
+        total: res.data.total,
+        loading: false,
+      });
     } catch (err) {
       handleError(err, set);
     }

@@ -1,9 +1,8 @@
-import jwt from 'jsonwebtoken';
-import sanitizedConfig from '../config.js';
-import { prisma } from '../config/db.js';
+import jwt from "jsonwebtoken";
+import sanitizedConfig from "../config.js";
+import { prisma } from "../config/db.js";
 
 export async function verifyToken(req, res, next) {
-
   const authHeader = req.headers["authorization"];
   const token = authHeader?.startsWith("Bearer ")
     ? authHeader.split(" ")[1]
