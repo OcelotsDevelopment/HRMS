@@ -124,7 +124,7 @@ const navItems: NavItem[] = [
         />
       </svg>
     ),
-    name: "User Management",
+    name: "Department Head Management",
     path: "/user-management",
   },
   {

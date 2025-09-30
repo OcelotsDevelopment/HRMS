@@ -16,7 +16,7 @@ export const sendEmail = async (to, subject, body) => {
       },
       Subject: { Data: subject }, // Email subject
     },
-    Source: 'admin@baleryon.in', // The "From" email address (must be verified in SES)
+    Source: 'admin@ocelots.in', // The "From" email address (must be verified in SES)
   };
 
   try {

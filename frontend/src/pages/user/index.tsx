@@ -24,7 +24,7 @@ export default function ListUser() {
 
   return (
     <>
-      <PageMeta title="User Management" description="List of system users" />
+      <PageMeta title="Department Head Management" description="List of system users" />
       <PageBreadcrumb pageTitle="User Table" />
       <div className="space-y-6">
         <ComponentCard
